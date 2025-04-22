@@ -1,0 +1,36 @@
+# === GLOBAL ===
+.DS_Store
+*.log
+.env
+*.env.local
+node_modules/
+dist/
+build/
+*.iml
+
+# === FRONTEND ===
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env*
+frontend/.DS_Store
+
+# === BACKEND (Gradle) ===
+backend/.gradle/
+backend/build/
+backend/out/
+backend/.idea/
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.vscode/
+backend/.DS_Store
+
+# === SYSTEM ===
+*.swp
+*~
+*.bak
+*.tmp
+*.temp
+*.sublime-workspace
+*.sublime-project
