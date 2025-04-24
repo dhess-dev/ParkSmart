@@ -6,7 +6,7 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
   const [message, setMessage] = useState('...loading')
-  const apiUrl = "localhost:8080" 
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   useEffect(() => {
     fetch(`${apiUrl}/api/hello`)

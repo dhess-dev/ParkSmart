@@ -42,5 +42,6 @@ jobs:
       - name: Build and push frontend Docker image
         working-directory: frontend
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/frontend:latest .
+          --build-arg VITE_API_URL=http://groupone_backend:8080 \
+          -t ghcr.io/${{ github.repository_owner }}/frontend:latest .
           docker push ghcr.io/${{ github.repository_owner }}/frontend:latest

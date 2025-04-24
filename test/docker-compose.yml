@@ -30,6 +30,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    build:
+      context: ../frontend
+      args:
+        VITE_API_URL: "http://groupone_backend:8080"
+    
 
   frontend:
     image: ghcr.io/fes-wiesbaden/frontend:latest
