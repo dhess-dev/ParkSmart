@@ -16,7 +16,7 @@ public class CardController {
     }
 
     @GetMapping
-    public List<Card> getAllUsers() {
+    public List<Card> getAllCards() {
         return repository.findAll();
     }
 
