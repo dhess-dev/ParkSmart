@@ -12,6 +12,14 @@ Examples:
 - `fix: correct API endpoint`
 - `docs: update README with setup info`
 
+### ✅ Project Structure
+```bash
+
+Cyberphysisches_System_Parkhaus/
+├── frontend/    # Vite + React app
+├── backend/     # Spring Boot app
+└── README.md
+```
 
 ## 🚀 How to Run This Project
 
@@ -60,26 +68,30 @@ Your frontend will start at:
 
 It automatically fetches data from the Spring Boot backend.
 
-### 🛠 How to Start?
+### 📘 Run Backend with Live API Docs (Scalar)
 
-If you want to run both parts together:
+⚠️ WSL (Windows Subsystem for Linux) is required on Windows to use this script.
+
+To launch the Spring Boot backend together with live API documentation powered by Scalar, run:
+
 
 ```bash
-# In one terminal
-cd backend && ./gradlew bootRun
-
-# In another terminal
-cd frontend && npm run dev
+./backend/scripts/run-dev.sh
 ```
 
-### ✅ Project Structure
-```bash
+This script will:
 
-Cyberphysisches_System_Parkhaus/
-├── frontend/    # Vite + React app
-├── backend/     # Spring Boot app
-└── README.md
-```
+✅ Start the Spring Boot backend at http://localhost:8080
+
+✅ Wait until it's ready
+
+✅ Generate the OpenAPI spec
+
+✅ Launch Scalar API docs at http://localhost:3000
+
+Requires: Node.js and internet (for first-time npx usage).
+
+Perfect for exploring and documenting your API while you build.
 
 ### 🧹 .gitignore
 Unnecessary files like node_modules/, build/, .gradle/, etc. are excluded using .gitignore.
