@@ -17,8 +17,7 @@ services:
       retries: 5
 
   backend:
-    build:
-      context: ../backend
+    image: ghcr.io/fes-wiesbaden/backend:latest
     container_name: groupone_backend
     environment:
       DB_HOST: postgres
@@ -33,15 +32,13 @@ services:
         condition: service_healthy
 
   frontend:
-    build:
-      context: ../frontend
+    image: ghcr.io/fes-wiesbaden/frontend:latest
     container_name: groupone_frontend
     ports:
       - "5173:80"
     depends_on:
       - backend
-    environment:
-    - VITE_API_URL="http://localhost:8080"
+
 
 volumes:
   postgres_data:
