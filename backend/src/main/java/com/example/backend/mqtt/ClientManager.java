@@ -32,7 +32,7 @@ public class ClientManager {
         this.MQTT_USER = "gruppe1";
         this.MQTT_PASSWORD = "gruppe1";
         this.MQTT_TOPIC = "testTopic";
-        this.CLIENT_ID = "testClientt";
+        this.CLIENT_ID = "testClient";
     }
 
     @PostConstruct
