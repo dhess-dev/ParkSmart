@@ -19,6 +19,7 @@ services:
   backend:
     image: ghcr.io/fes-wiesbaden/backend:latest
     container_name: groupone_backend
+    platform: linux/arm64
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -31,19 +32,20 @@ services:
       postgres:
         condition: service_healthy
     build:
-      context: ../frontend
+      context: ../backend
       args:
-        VITE_API_URL: "http://groupone_backend:8080"
-    
+        VITE_API_URL: "http://localhost:8080"
 
   frontend:
     image: ghcr.io/fes-wiesbaden/frontend:latest
     container_name: groupone_frontend
+    platform: linux/arm64
     ports:
       - "5173:80"
     depends_on:
       - backend
-
+    environment:
+      - VITE_API_URL="http://localhost:8080"
 
 volumes:
   postgres_data:
