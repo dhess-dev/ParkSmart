@@ -6,13 +6,14 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
   const [message, setMessage] = useState('...loading')
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/hello')
+    fetch(`${apiUrl}/api/hello`)
       .then((res) => res.json())
       .then((data) => setMessage(data.message))
       .catch((err) => setMessage('Error: ' + err.message))
-  }, [])
+}, [])
 
   useEffect(() => {
     if (count != 0) {
