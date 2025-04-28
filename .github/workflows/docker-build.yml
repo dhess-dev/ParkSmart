@@ -1,4 +1,3 @@
-# filepath: .github/workflows/docker-build.yml
 name: Build and Push to GitHub Container Registry
 
 on:
