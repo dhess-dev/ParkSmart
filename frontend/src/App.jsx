@@ -15,12 +15,6 @@ function App() {
       .catch((err) => setMessage('Error: ' + err.message))
 }, [])
 
-  useEffect(() => {
-    if (count != 0) {
-      fetch('http://localhost:8080/api/mqtt')
-    }
-  }, [count])
-
   return (
     <>
       <div>
