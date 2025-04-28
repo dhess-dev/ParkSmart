@@ -20,7 +20,7 @@ import jakarta.annotation.PostConstruct;
 @RequestMapping("/api")
 public class ClientManager {
 
-    private final String BROKER_ADDRESS; 
+    private final String BROKER_ADDRESS;
     private final String MQTT_USER;
     private final String MQTT_PASSWORD;
     private final String MQTT_TOPIC;
@@ -28,11 +28,11 @@ public class ClientManager {
     private static IMqttClient mqttClient;
 
     public ClientManager() {
-        this.BROKER_ADDRESS = "tcp://192.168.2.189:1883";
+        this.BROKER_ADDRESS = "tcp://gruppe1iot.local:1883";
         this.MQTT_USER = "gruppe1";
         this.MQTT_PASSWORD = "gruppe1";
         this.MQTT_TOPIC = "testTopic";
-        this.CLIENT_ID = "testClient";   
+        this.CLIENT_ID = "testClient";
     }
 
     @PostConstruct
@@ -50,7 +50,7 @@ public class ClientManager {
                 try {
                     mqttClient.connect(options);
                     System.out.println("Successfully connected to MQTT broker.");
-                    subscribeTopic();  
+                    subscribeTopic();
                 } catch (MqttException e) {
                     System.out.println("Connection error: " + e.getMessage());
                 }
@@ -58,7 +58,7 @@ public class ClientManager {
         } catch (MqttException e) {
             System.out.println("Error while connecting to MQTT broker: " + e.getMessage() + " (Error Code: " + e.getReasonCode() + ")");
         }
-    
+
         return mqttClient;
     }
 
@@ -66,11 +66,11 @@ public class ClientManager {
     @GetMapping("/mqtt")
     public void publishMessage() throws MqttException {
         String message = "Message from Backend";
-            if (mqttClient == null || !mqttClient.isConnected()) {
-                connectMqttClient();
-            }
-            mqttClient.publish(MQTT_TOPIC, message.getBytes(StandardCharsets.UTF_8), 2, false);
-            System.out.println("Message published: " + message);
+        if (mqttClient == null || !mqttClient.isConnected()) {
+            connectMqttClient();
+        }
+        mqttClient.publish(MQTT_TOPIC, message.getBytes(StandardCharsets.UTF_8), 2, false);
+        System.out.println("Message published: " + message);
     }
 
     public void subscribeTopic() throws MqttException {
