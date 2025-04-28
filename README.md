@@ -40,6 +40,47 @@ Make sure you have the following installed:
 
 ---
 
+### ⚙️ Backend HTTPS Setup (Important!)
+
+Our backend now uses HTTPS (secure communication).
+
+You need two additional files to run the backend:
+
+keystore.p12 ➔ SSL certificate (not in Git, request it from project owner)
+
+.env ➔ Environment variables file (must be created manually)
+
+Steps:
+
+Create a .env file inside the backend/ folder:
+
+```bash
+KEYSTORE_PASSWORD=password
+```
+
+Copy the keystore.p12 file you received into:
+
+```bash
+backend/src/main/resources/
+```
+
+Load the environment variables:
+
+```bash
+source .env
+```
+
+Build and run the backend:
+
+```bash
+./gradlew build
+java -jar build/libs/demo-0.0.1-SNAPSHOT.jar
+```
+
+✅ The backend will now run securely at:
+
+👉 https://localhost:8443
+
 ### ▶️ Running the Backend (Spring Boot)
 
 ```bash
