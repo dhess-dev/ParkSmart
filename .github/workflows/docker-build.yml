@@ -1,9 +1,10 @@
 name: Build and Push to GitHub Container Registry
 
 on:
-  push:
-    branches:
-      - feat/dockerize-project
+   push:
+    branches: [ "main" ]
+   pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
