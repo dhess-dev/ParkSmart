@@ -32,6 +32,15 @@ public class ClientManager {
     }
 
     @PostConstruct
+    public void subscribeAllTopics() {
+        if (mqttClient == null || !mqttClient.isConnected()) {
+            connectMqttClient();
+        }
+        if (mqttClient != null && mqttClient.isConnected()) {
+            subscribeTopic("parking/gate/validation/rfid");
+        }
+    }
+
     public IMqttClient connectMqttClient() {
         try {
             if (mqttClient == null) {
@@ -43,40 +52,43 @@ public class ClientManager {
                 options.setUserName(MQTT_USER);
                 options.setPassword(MQTT_PASSWORD.toCharArray());
                 options.setCleanSession(true);
-                try {
-                    mqttClient.connect(options);
-                    System.out.println("Successfully connected to MQTT broker.");
-                } catch (MqttException e) {
-                    System.out.println("Connection error: " + e.getMessage());
-                }
+                mqttClient.connect(options);
+                System.out.println("Successfully connected to MQTT broker.");
             }
         } catch (MqttException e) {
             System.out.println("Error while connecting to MQTT broker: " + e.getMessage() + " (Error Code: " + e.getReasonCode() + ")");
-        }
 
+        }
         return mqttClient;
     }
 
-    @PostConstruct
-    public void subscribeAllTopics() throws MqttException {
-        subscribeTopic("parking/gate/validation/rfid");
+    public void publishMessage(String topic, String message) {
+        try {
+            if (mqttClient == null || !mqttClient.isConnected()) {
+                connectMqttClient();
+            }
+            if (mqttClient != null && mqttClient.isConnected()) {
+                mqttClient.publish(topic, message.getBytes(StandardCharsets.UTF_8), 2, false);
+                System.out.println("Message published: " + message);
+            }
+        } catch (MqttException e) {
+            System.out.println("Failed to publish message: " + e.getMessage());
+        }
     }
 
-    public void publishMessage(String topic, String message) throws MqttException {
-        if (mqttClient == null || !mqttClient.isConnected()) {
-            connectMqttClient();
+    public void subscribeTopic(String topic) {
+        try {
+            if (mqttClient == null || !mqttClient.isConnected()) {
+                connectMqttClient();
+            }
+            if (mqttClient != null && mqttClient.isConnected()) {
+                mqttClient.setCallback(new CallbackHandler(this, cardController));
+                mqttClient.subscribe(topic);
+                System.out.println("Subscribed to topic: " + topic);
+            }
+        } catch (MqttException e) {
+            System.out.println("Failed to subscribe to topic '" + topic + "': " + e.getMessage());
         }
-        mqttClient.publish(topic, message.getBytes(StandardCharsets.UTF_8), 2, false);
-        System.out.println("Message published: " + message);
-    }
-
-    public void subscribeTopic(String topic) throws MqttException {
-        if (mqttClient == null || !mqttClient.isConnected()) {
-            connectMqttClient();
-        }
-        mqttClient.setCallback(new CallbackHandler(this, cardController));
-        mqttClient.subscribe(topic);
-        System.out.println("Subscribed to topic: " + topic);
     }
 
     public void handleReceivedMessage(String topic, MqttMessage message) {
