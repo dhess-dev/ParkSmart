@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
+    backend:
     image: ghcr.io/fes-wiesbaden/backend:latest
     container_name: groupone_backend
     platform: linux/arm64
@@ -28,9 +28,11 @@ services:
       DB_NAME: groupone_db
       DB_USER: postgres
       DB_PASSWORD: password
-      KEYSTORE_PASSWORD: gruppe1    # <-- ✅ very important now
+      KEYSTORE_PASSWORD: gruppe1
     ports:
-      - "8443:8443"                  # <-- ✅ Expose the correct HTTPS port
+      - "8443:8443"
+    volumes:
+      - /home/gruppe1/keystore.p12:/app/keystore.p12   # <-- 🛠️ Mount it inside the container
     depends_on:
       postgres:
         condition: service_healthy
