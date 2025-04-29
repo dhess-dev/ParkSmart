@@ -38,5 +38,6 @@ out/
 
 # SSL/Certificates
 key.pem
+cert.pem
 certificate.pem
 keystore.p12

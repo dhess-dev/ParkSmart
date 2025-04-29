@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   postgres:
     image: postgres:16
@@ -26,15 +28,12 @@ services:
       DB_NAME: groupone_db
       DB_USER: postgres
       DB_PASSWORD: password
+      KEYSTORE_PASSWORD: gruppe1    # <-- ✅ very important now
     ports:
-      - "8080:8080"
+      - "8443:8443"                  # <-- ✅ Expose the correct HTTPS port
     depends_on:
       postgres:
         condition: service_healthy
-    build:
-      context: ../backend
-      args:
-        VITE_API_URL: "http://localhost:8080"
 
   frontend:
     image: ghcr.io/fes-wiesbaden/frontend:latest
@@ -45,7 +44,8 @@ services:
     depends_on:
       - backend
     environment:
-      - VITE_API_URL="http://localhost:8080"
+      VITE_API_URL: "https://backend:8443"   # <-- ✅ API URL points to backend HTTPS
+    # notice: it's backend (the docker service name), not localhost
 
 volumes:
   postgres_data:
