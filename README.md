@@ -2,6 +2,7 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=19273914&assignment_repo_type=AssignmentRepo)
 
 ---
+
 ### 💬 Commit Guidelines
 
 > ⚠️ Please follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) when committing changes.
@@ -13,6 +14,7 @@ Examples:
 - `docs: update README with setup info`
 
 ### ✅ Project Structure
+
 ```bash
 
 Cyberphysisches_System_Parkhaus/
@@ -105,6 +107,7 @@ cd frontend
 npm install
 npm run dev
 ```
+
 Your frontend will start at:
 👉 http://localhost:5173
 
@@ -115,7 +118,6 @@ It automatically fetches data from the Spring Boot backend.
 ⚠️ WSL (Windows Subsystem for Linux) is required on Windows to use this script.
 
 To launch the Spring Boot backend together with live API documentation powered by Scalar, run:
-
 
 ```bash
 ./backend/scripts/run-dev.sh
@@ -136,4 +138,11 @@ Requires: Node.js and internet (for first-time npx usage).
 Perfect for exploring and documenting your API while you build.
 
 ### 🧹 .gitignore
+
 Unnecessary files like node_modules/, build/, .gradle/, etc. are excluded using .gitignore.
+
+### Run Chrome igonring cert
+
+```bash
+chrome.exe --ignore-certificate-errors
+```
