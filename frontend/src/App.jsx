@@ -15,37 +15,13 @@ function App() {
       .then((res) => res.json())
       .then((data) => setMessage(data.message))
       .catch((err) => setMessage("Error: " + err.message));
-  }, [apiUrl]);
+  }, []);
 
   useEffect(() => {
-    if (count !== 0) {
-      fetch(`${apiUrl}/api/mqtt`).catch((err) =>
-        console.error("Failed to trigger MQTT action:", err)
-      );
+    if (count != 0) {
+      fetch("http://localhost:8080/api/mqtt");
     }
-  }, [count, apiUrl]);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const usersResponse = await fetch(`${apiUrl}/api/users`);
-        const cardsResponse = await fetch(`${apiUrl}/api/cards`);
-
-        const usersData = await usersResponse.json();
-        const cardsData = await cardsResponse.json();
-
-        console.log("Fetched users:", usersData);
-        console.log("Fetched cards:", cardsData);
-
-        setUsers(usersData);
-        setCards(cardsData);
-      } catch (error) {
-        console.error("Failed to fetch users or cards", error);
-      }
-    }
-
-    fetchData();
-  }, [apiUrl]);
+  }, [count]);
 
   return (
     <>
