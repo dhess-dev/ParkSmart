@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   postgres:
     image: postgres:16
@@ -16,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
+  backend:  # ✅ Fix indentation here
     image: ghcr.io/fes-wiesbaden/backend:latest
     container_name: groupone_backend
     platform: linux/arm64
@@ -26,15 +28,14 @@ services:
       DB_NAME: groupone_db
       DB_USER: postgres
       DB_PASSWORD: password
+      KEYSTORE_PASSWORD: gruppe1
     ports:
-      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - /home/gruppe1/keystore.p12:/app/keystore.p12
     depends_on:
       postgres:
         condition: service_healthy
-    build:
-      context: ../backend
-      args:
-        VITE_API_URL: "http://localhost:8080"
 
   frontend:
     image: ghcr.io/fes-wiesbaden/frontend:latest
@@ -45,7 +46,7 @@ services:
     depends_on:
       - backend
     environment:
-      - VITE_API_URL="http://localhost:8080"
+      VITE_API_URL: "https://backend:8443"
 
 volumes:
   postgres_data:
