@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
 
-    backend:
+  backend:  # ✅ Fix indentation here
     image: ghcr.io/fes-wiesbaden/backend:latest
     container_name: groupone_backend
     platform: linux/arm64
@@ -32,7 +32,7 @@ services:
     ports:
       - "8443:8443"
     volumes:
-      - /home/gruppe1/keystore.p12:/app/keystore.p12   # <-- 🛠️ Mount it inside the container
+      - /home/gruppe1/keystore.p12:/app/keystore.p12
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,8 +46,7 @@ services:
     depends_on:
       - backend
     environment:
-      VITE_API_URL: "https://backend:8443"   # <-- ✅ API URL points to backend HTTPS
-    # notice: it's backend (the docker service name), not localhost
+      VITE_API_URL: "https://backend:8443"
 
 volumes:
   postgres_data:
