@@ -8,6 +8,9 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.example.backend.controller.CardController;
 
@@ -15,20 +18,30 @@ import jakarta.annotation.PostConstruct;
 
 @Component
 public class ClientManager {
+    private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
+    private static final int MAX_RETRIES = 5;
+    private static final long RETRY_DELAY_MS = 5000;
+    private static final String DEFAULT_BROKER = "tcp://gruppe1iot.local:1883";
 
-    private final String BROKER_ADDRESS;
-    private final String MQTT_USER;
-    private final String MQTT_PASSWORD;
-    private final String CLIENT_ID;
-    private static IMqttClient mqttClient;
+    private final String brokerUrl;
+    private final String username;
+    private final String password;
+    private final String clientId;
+    private IMqttClient mqttClient;
     private final CardController cardController;
 
-    public ClientManager(CardController cardController) {
-        this.BROKER_ADDRESS = "tcp://gruppe1iot.local:1883";
-        this.MQTT_USER = "gruppe1";
-        this.MQTT_PASSWORD = "gruppe1";
-        this.CLIENT_ID = "testClient";
+    public ClientManager(
+        @Value("${MQTT_BROKER_URL:#{null}}") String mqttBrokerUrl,
+        @Value("${MQTT_USERNAME:gruppe1}") String mqttUsername,
+        @Value("${MQTT_PASSWORD:gruppe1}") String mqttPassword,
+        CardController cardController
+    ) {
+        this.brokerUrl = mqttBrokerUrl != null ? mqttBrokerUrl : DEFAULT_BROKER;
+        this.username = mqttUsername;
+        this.password = mqttPassword;
+        this.clientId = "backend_" + System.currentTimeMillis();
         this.cardController = cardController;
+        logger.info("Using MQTT broker at: {}", this.brokerUrl);
     }
 
     @PostConstruct
@@ -44,13 +57,13 @@ public class ClientManager {
     public IMqttClient connectMqttClient() {
         try {
             if (mqttClient == null) {
-                mqttClient = new MqttClient(BROKER_ADDRESS, CLIENT_ID);
+                mqttClient = new MqttClient(brokerUrl, clientId);
             }
             if (!mqttClient.isConnected()) {
                 System.out.println("Connecting to MQTT broker...");
                 MqttConnectOptions options = new MqttConnectOptions();
-                options.setUserName(MQTT_USER);
-                options.setPassword(MQTT_PASSWORD.toCharArray());
+                options.setUserName(username);
+                options.setPassword(password.toCharArray());
                 options.setCleanSession(true);
                 mqttClient.connect(options);
                 System.out.println("Successfully connected to MQTT broker.");
