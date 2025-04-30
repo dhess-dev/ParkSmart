@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { TextField, Button, Typography, Box } from "@mui/material";
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -32,31 +33,45 @@ function Login({ onLogin }) {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-      {message && <p>{message}</p>}
-    </div>
+    <Box
+      component="form"
+      onSubmit={handleLogin}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        maxWidth: 400,
+        margin: "auto",
+        mt: 5,
+      }}
+    >
+      <Typography variant="h4" component="h1" align="center">
+        Login
+      </Typography>
+      <TextField
+        label="Username"
+        variant="outlined"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        required
+      />
+      <TextField
+        label="Password"
+        type="password"
+        variant="outlined"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+      />
+      <Button type="submit" variant="contained" color="secondary">
+        Login
+      </Button>
+      {message && (
+        <Typography color="error" align="center">
+          {message}
+        </Typography>
+      )}
+    </Box>
   );
 }
 
