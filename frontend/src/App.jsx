@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
+import Login from "./Login";
 
 function App() {
   const [count, setCount] = useState(0);
   const [message, setMessage] = useState("...loading");
-  const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
   const [users, setUsers] = useState([]);
   const [cards, setCards] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
 
   useEffect(() => {
     fetch(`${apiUrl}/api/hello`)
@@ -18,10 +20,14 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (count != 0) {
+    if (count !== 0) {
       fetch("http://localhost:8080/api/mqtt");
     }
   }, [count]);
+
+  if (!isLoggedIn) {
+    return <Login onLogin={() => setIsLoggedIn(true)} />;
+  }
 
   return (
     <>
