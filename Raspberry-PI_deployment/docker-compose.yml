@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:  # ✅ Fix indentation here
+  backend:
     image: ghcr.io/fes-wiesbaden/backend:latest
     container_name: groupone_backend
     platform: linux/arm64
@@ -29,10 +29,17 @@ services:
       DB_USER: postgres
       DB_PASSWORD: password
       KEYSTORE_PASSWORD: gruppe1
+      SERVER_SSL_KEY_STORE: file:/app/keystore.p12
+      MQTT_BROKER_URL: "tcp://host.docker.internal:1883"
+      MQTT_USERNAME: "gruppe1"
+      MQTT_PASSWORD: "gruppe1"
+      CORS_Origin: "http://gruppe1iot.local:5173"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8443:8443"
     volumes:
-      - /home/gruppe1/keystore.p12:/app/keystore.p12
+      - ./keystore.p12:/app/keystore.p12
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,7 +53,7 @@ services:
     depends_on:
       - backend
     environment:
-      VITE_API_URL: "https://backend:8443"
+      VITE_API_URL: "https://gruppe1iot.local:8443"
 
 volumes:
   postgres_data:
