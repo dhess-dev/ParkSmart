@@ -7,6 +7,11 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +21,10 @@ import com.example.backend.controller.CardController;
 
 import jakarta.annotation.PostConstruct;
 
+@EnableAsync
 @Component
+@Configuration
+@EnableScheduling
 public class ClientManager {
     private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
     private static final int MAX_RETRIES = 5;
@@ -70,9 +78,16 @@ public class ClientManager {
             }
         } catch (MqttException e) {
             System.out.println("Error while connecting to MQTT broker: " + e.getMessage() + " (Error Code: " + e.getReasonCode() + ")");
-
         }
         return mqttClient;
+    }
+
+    @Async
+    @Scheduled(fixedDelay = 10000)
+    public void reconnectMqtt() {
+        if (!mqttClient.isConnected()) {
+            connectMqttClient();
+        }
     }
 
     public void publishMessage(String topic, String message) {
@@ -91,9 +106,6 @@ public class ClientManager {
 
     public void subscribeTopic(String topic) {
         try {
-            if (mqttClient == null || !mqttClient.isConnected()) {
-                connectMqttClient();
-            }
             if (mqttClient != null && mqttClient.isConnected()) {
                 mqttClient.setCallback(new CallbackHandler(this, cardController));
                 mqttClient.subscribe(topic);
