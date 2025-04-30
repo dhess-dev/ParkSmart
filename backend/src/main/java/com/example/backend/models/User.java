@@ -1,9 +1,10 @@
 package com.example.backend.models;
 
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
-@Table(name = "users") 
+@Table(name = "users")
 public class User {
 
     @Id
@@ -12,6 +13,8 @@ public class User {
 
     private String username;
     private String email;
+
+    private String password;
 
     public Long getId() {
         return id;
@@ -35,5 +38,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = new BCryptPasswordEncoder().encode(password);
     }
 }
