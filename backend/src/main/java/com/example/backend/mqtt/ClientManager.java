@@ -1,21 +1,21 @@
 package com.example.backend.mqtt;
 
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.springframework.context.annotation.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 import com.example.backend.controller.CardController;
 
@@ -23,13 +23,10 @@ import jakarta.annotation.PostConstruct;
 
 @EnableAsync
 @Component
-@Configuration
 @EnableScheduling
 public class ClientManager {
+
     private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
-    private static final int MAX_RETRIES = 5;
-    private static final long RETRY_DELAY_MS = 5000;
-    private static final String DEFAULT_BROKER = "tcp://gruppe1iot.local:1883";
 
     private final String brokerUrl;
     private final String username;
@@ -39,15 +36,15 @@ public class ClientManager {
     private final CardController cardController;
 
     public ClientManager(
-        @Value("${MQTT_BROKER_URL:#{null}}") String mqttBrokerUrl,
-        @Value("${MQTT_USERNAME:gruppe1}") String mqttUsername,
-        @Value("${MQTT_PASSWORD:gruppe1}") String mqttPassword,
-        CardController cardController
+            @Value("${MQTT_BROKER_URL:tcp://gruppe1iot.local:1883}") String mqttBrokerUrl,
+            @Value("${MQTT_USERNAME:gruppe1}") String mqttUsername,
+            @Value("${MQTT_PASSWORD:gruppe1}") String mqttPassword,
+            CardController cardController
     ) {
-        this.brokerUrl = mqttBrokerUrl != null ? mqttBrokerUrl : DEFAULT_BROKER;
+        this.brokerUrl = mqttBrokerUrl;
         this.username = mqttUsername;
         this.password = mqttPassword;
-        this.clientId = "backend_" + System.currentTimeMillis();
+        this.clientId = "client_" + UUID.randomUUID().toString();
         this.cardController = cardController;
         logger.info("Using MQTT broker at: {}", this.brokerUrl);
     }
@@ -58,7 +55,7 @@ public class ClientManager {
             connectMqttClient();
         }
         if (mqttClient != null && mqttClient.isConnected()) {
-            subscribeTopic("parking/gate/validation/rfid");
+            subscribeTopic("parking/backend/#");
         }
     }
 
@@ -68,16 +65,16 @@ public class ClientManager {
                 mqttClient = new MqttClient(brokerUrl, clientId);
             }
             if (!mqttClient.isConnected()) {
-                System.out.println("Connecting to MQTT broker...");
+                logger.info("Connecting to MQTT broker...");
                 MqttConnectOptions options = new MqttConnectOptions();
                 options.setUserName(username);
                 options.setPassword(password.toCharArray());
                 options.setCleanSession(true);
                 mqttClient.connect(options);
-                System.out.println("Successfully connected to MQTT broker.");
+                logger.info("Successfully connected to MQTT broker.");
             }
         } catch (MqttException e) {
-            System.out.println("Error while connecting to MQTT broker: " + e.getMessage() + " (Error Code: " + e.getReasonCode() + ")");
+            logger.error("Error while connecting to MQTT broker: {} (Error Code: {})", e.getMessage(), e.getReasonCode());
         }
         return mqttClient;
     }
@@ -97,10 +94,10 @@ public class ClientManager {
             }
             if (mqttClient != null && mqttClient.isConnected()) {
                 mqttClient.publish(topic, message.getBytes(StandardCharsets.UTF_8), 2, false);
-                System.out.println("Message published: " + message);
+                logger.info("Message published to '{}': {}", topic, message);
             }
         } catch (MqttException e) {
-            System.out.println("Failed to publish message: " + e.getMessage());
+            logger.error("Failed to publish message: {}", e.getMessage());
         }
     }
 
@@ -109,16 +106,15 @@ public class ClientManager {
             if (mqttClient != null && mqttClient.isConnected()) {
                 mqttClient.setCallback(new CallbackHandler(this, cardController));
                 mqttClient.subscribe(topic);
-                System.out.println("Subscribed to topic: " + topic);
+                logger.info("Subscribed to topic: {}", topic);
             }
         } catch (MqttException e) {
-            System.out.println("Failed to subscribe to topic '" + topic + "': " + e.getMessage());
+            logger.error("Failed to subscribe to topic '{}': {}", topic, e.getMessage());
         }
     }
 
     public void handleReceivedMessage(String topic, MqttMessage message) {
-        byte[] payload = message.getPayload();
-        String msgContent = new String(payload, StandardCharsets.UTF_8);
-        System.out.println("Message received on topic '" + topic + "': " + msgContent);
+        String msgContent = new String(message.getPayload(), StandardCharsets.UTF_8);
+        logger.info("Message received on topic '{}': {}", topic, msgContent);
     }
 }
