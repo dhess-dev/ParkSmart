@@ -26,7 +26,9 @@ dependencies {
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools' 
+    implementation 'com.google.zxing:core:3.5.1'
+    implementation 'com.google.zxing:javase:3.5.1'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools' // <-- NEW for auto-restart
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
