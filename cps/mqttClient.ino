@@ -15,7 +15,7 @@ const int mqtt_port = 1883;
 const char *mqtt_user = "gruppe1";
 const char *mqtt_password = "gruppe1";
 
-// RFID setup
+// RFID configuration
 MFRC522DriverPinSimple ss_pin(8);
 MFRC522DriverSPI driver{ss_pin};
 MFRC522 mfrc522{driver};
@@ -23,6 +23,14 @@ MFRC522 mfrc522{driver};
 // Servo motor setup
 Servo servo;
 const int servoPin = 18;
+
+// Ultra sonic setup
+const int trigPin = 5;
+const int echoPin = 7;
+#define SOUND_SPEED 0.034
+long duration;
+float distance;
+boolean isParkingSpotOccupied;
 
 // MQTT Client and timer handles
 AsyncMqttClient mqttClient;
@@ -74,7 +82,7 @@ void onMqttConnect(bool sessionPresent)
 {
   Serial.println("Connected to MQTT");
   // Subscribe to the "open gate" topic
-  mqttClient.subscribe("parking/gate/open", 0);
+  mqttClient.subscribe("parking/cps/#", 2);
 }
 
 // MQTT disconnect callback
@@ -99,7 +107,7 @@ void closeGate(TimerHandle_t xTimer)
 // MQTT message callback
 void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
 {
-  if (strcmp(topic, "parking/gate/open") == 0)
+  if (strcmp(topic, "parking/cps/gate/open") == 0)
   {
     Serial.println("Opening gate...");
     // Rotate servo to 90 degrees to open the gate
@@ -124,12 +132,16 @@ void setup()
   Serial.begin(115200);
   delay(1000);
 
-  // Initialize RFID
+  // Setup RFID
   mfrc522.PCD_Init();
   Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 
   // Setup Servo motor
   servo.attach(servoPin);
+
+  // Setup ultrao sonic
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 
   // Setup timers for MQTT, WiFi, and gate close
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
@@ -153,39 +165,51 @@ void setup()
 
 void loop()
 {
-  // Check if a new RFID card is present
-  if (!mfrc522.PICC_IsNewCardPresent())
+  // --- RFID: Detect card and send UID ---
+  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())
   {
-    // No new card
-    return;
-  }
-
-  if (!mfrc522.PICC_ReadCardSerial())
-  {
-    // Failed to read card serial
-    return;
-  }
-
-  // Convert the UID of the RFID card to a string
-  String uidString = "";
-  for (byte i = 0; i < mfrc522.uid.size; i++)
-  {
-    if (mfrc522.uid.uidByte[i] < 0x10)
+    // Convert UID to string
+    String uidString = "";
+    for (byte i = 0; i < mfrc522.uid.size; i++)
     {
-      // Add leading zero for hex digits
-      uidString += "0";
+      if (mfrc522.uid.uidByte[i] < 0x10)
+      {
+        uidString += "0";
+      }
+      uidString += String(mfrc522.uid.uidByte[i], HEX);
     }
-    // Convert to hex
-    uidString += String(mfrc522.uid.uidByte[i], HEX);
+    uidString.toUpperCase();
+    Serial.println("UID: " + uidString);
+
+    // Publish UID to MQTT for validation
+    mqttClient.publish("parking/backend/gate/validation/rfid", 0, false, uidString.c_str());
+
+    // Deactivate the card
+    mfrc522.PICC_HaltA();
+    mfrc522.PCD_StopCrypto1();
   }
-  uidString.toUpperCase();
-  Serial.println("UID: " + uidString);
 
-  // Publish RFID UID to MQTT for validation
-  mqttClient.publish("parking/gate/validation/rfid", 0, false, uidString.c_str());
+  // --- Ultrasonic: Measure distance and publish ---
+  // Clears the trigPin
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
 
-  // Deactivate the tag
-  mfrc522.PICC_HaltA();
-  // Stop encryption
-  mfrc522.PCD_StopCrypto1();
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+
+  // Calculate the distance
+  distance = duration * SOUND_SPEED / 2;
+
+  Serial.print("Distance (cm): ");
+  Serial.println(distance);
+
+  String payload = String(distance, 2);
+  mqttClient.publish("parking/backend/spot/distance", 0, false, payload.c_str());
+
+  // Small delay to avoid overloading the loop
+  delay(200);
 }
