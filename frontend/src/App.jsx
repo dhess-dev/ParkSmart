@@ -1,82 +1,29 @@
-import { useState, useEffect } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useState } from "react";
 import Login from "./Login";
+import Layout from "./Layout";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [message, setMessage] = useState("...loading");
-  const [users, setUsers] = useState([]);
-  const [cards, setCards] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
-
-  useEffect(() => {
-    fetch(`${apiUrl}/api/hello`)
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message))
-      .catch((err) => setMessage("Error: " + err.message));
-  }, []);
-
-  useEffect(() => {
-    if (count !== 0) {
-      fetch("http://localhost:8080/api/mqtt");
-    }
-  }, [count]);
 
   if (!isLoggedIn) {
     return <Login onLogin={() => setIsLoggedIn(true)} />;
   }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <h1>Hello from Spring: {message}</h1>
-
-      <div>
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-
-      <div style={{ display: "flex", gap: "2rem", marginTop: "2rem" }}>
-        <div>
-          <h2>Users</h2>
-          <ul>
-            {users.map((user) => (
-              <li key={user.id}>
-                {user.username} ({user.email})
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h2>Cards</h2>
-          <ul>
-            {cards.map((card) => (
-              <li key={card.id}>Card Code: {card.cardCode}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
