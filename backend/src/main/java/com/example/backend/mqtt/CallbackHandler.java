@@ -8,20 +8,19 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.backend.controller.CardController;
+import com.example.backend.controller.GateAccessController;
 
 public class CallbackHandler implements MqttCallback {
 
+    private final GateAccessController gateAccessController;
     private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
 
-    private final CardController cardController;
     private final ClientManager mqttClientManager;
-
     private boolean isSpotOccupied;
 
-    public CallbackHandler(ClientManager mqttClientManager, CardController cardController) {
+    public CallbackHandler(ClientManager mqttClientManager, GateAccessController gateAccessController) {
         this.mqttClientManager = mqttClientManager;
-        this.cardController = cardController;
+        this.gateAccessController = gateAccessController;
     }
 
     @Override
@@ -35,7 +34,7 @@ public class CallbackHandler implements MqttCallback {
 
         if (topic.equals("parking/backend/gate/validation/rfid")) {
             String cardCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-            if (cardController.getCardByCardCode(cardCode) != null) {
+            if (gateAccessController.getCardByRfidCode(cardCode) != null) {
                 mqttClientManager.publishMessage("parking/cps/gate/open", "1");
             }
         }
