@@ -15,7 +15,7 @@ const int mqtt_port = 1883;
 const char *mqtt_user = "gruppe1";
 const char *mqtt_password = "gruppe1";
 
-// RFID configuration
+// RFID setup
 MFRC522DriverPinSimple ss_pin(8);
 MFRC522DriverSPI driver{ss_pin};
 MFRC522 mfrc522{driver};
@@ -31,6 +31,10 @@ const int echoPin = 7;
 long duration;
 float distance;
 boolean isParkingSpotOccupied;
+
+// LED setup
+const int ledRed = 16;
+const int ledGreen = 17;
 
 // MQTT Client and timer handles
 AsyncMqttClient mqttClient;
@@ -82,7 +86,7 @@ void onMqttConnect(bool sessionPresent)
 {
   Serial.println("Connected to MQTT");
   // Subscribe to the "open gate" topic
-  mqttClient.subscribe("parking/cps/#", 2);
+  mqttClient.subscribe("cps/#", 2);
 }
 
 // MQTT disconnect callback
@@ -107,13 +111,28 @@ void closeGate(TimerHandle_t xTimer)
 // MQTT message callback
 void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
 {
-  if (strcmp(topic, "parking/cps/gate/open") == 0)
+  if (strcmp(topic, "cps/parking/gate/open") == 0)
   {
     Serial.println("Opening gate...");
     // Rotate servo to 90 degrees to open the gate
     servo.write(90);
     // Start timer to close the gate after 6 seconds
     xTimerStart(gateCloseTimer, 0);
+  }
+  if (strcmp(topic, "cps/parking/spot/isOccupied") == 0)
+  {
+    if (payload[0] == '1')
+    {
+      // Parking spot occupied -> set LED red
+      digitalWrite(ledRed, HIGH);
+      digitalWrite(ledGreen, LOW);
+    }
+    else if (payload[0] == '0')
+    {
+      // Parking spot not occupied -> Set LED green
+      digitalWrite(ledRed, LOW);
+      digitalWrite(ledGreen, HIGH);
+    }
   }
 
   // Print received MQTT message
@@ -134,7 +153,7 @@ void setup()
 
   // Setup RFID
   mfrc522.PCD_Init();
-  Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
+  Serial.println(F("Scan PICC To See UID Of RFID-Chip"));
 
   // Setup Servo motor
   servo.attach(servoPin);
@@ -142,6 +161,10 @@ void setup()
   // Setup ultrao sonic
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+
+  // Setup LED
+  pinMode(ledRed, OUTPUT);
+  pinMode(ledGreen, OUTPUT);
 
   // Setup timers for MQTT, WiFi, and gate close
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
@@ -182,7 +205,7 @@ void loop()
     Serial.println("UID: " + uidString);
 
     // Publish UID to MQTT for validation
-    mqttClient.publish("parking/backend/gate/validation/rfid", 0, false, uidString.c_str());
+    mqttClient.publish("backend/parking/gate/validation/rfid", 0, false, uidString.c_str());
 
     // Deactivate the card
     mfrc522.PICC_HaltA();
@@ -208,7 +231,7 @@ void loop()
   Serial.println(distance);
 
   String payload = String(distance, 2);
-  mqttClient.publish("parking/backend/spot/distance", 0, false, payload.c_str());
+  mqttClient.publish("backend/parking/spot/distance", 0, false, payload.c_str());
 
   // Small delay to avoid overloading the loop
   delay(200);

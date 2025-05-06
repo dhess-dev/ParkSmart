@@ -32,19 +32,19 @@ public class CallbackHandler implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         mqttClientManager.handleReceivedMessage(topic, message);
 
-        if (topic.equals("parking/backend/gate/validation/rfid")) {
+        if (topic.equals("backend/parking/gate/validation/rfid")) {
             String cardCode = new String(message.getPayload(), StandardCharsets.UTF_8);
             if (gateAccessController.getCardByRfidCode(cardCode) != null) {
-                mqttClientManager.publishMessage("parking/cps/gate/open", "1");
+                mqttClientManager.publishMessage("cps/parking/gate/open", "1");
             }
         }
 
-        if (topic.equals("parking/backend/spot/distance")) {
+        if (topic.equals("backend/parking/spot/distance")) {
             String payload = new String(message.getPayload());
             float distance = Float.parseFloat(payload);
             if ((distance <= 5) != isSpotOccupied) {
                 isSpotOccupied = (distance <= 5);
-                mqttClientManager.publishMessage("parking/cps/spot/isOccupied", isSpotOccupied ? "1" : "0");
+                mqttClientManager.publishMessage("cps/parking/spot/isOccupied", isSpotOccupied ? "1" : "0");
             }
         }
     }
