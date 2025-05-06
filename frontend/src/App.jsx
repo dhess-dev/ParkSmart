@@ -1,30 +1,44 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
-import Login from "./Login";
+import {BrowserRouter, Routes, Route} from "react-router-dom";
 import Layout from "./Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import {useState, useEffect} from "react";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  if (!isLoggedIn) {
-    return <Login onLogin={() => setIsLoggedIn(true)} />;
-  }
+    useEffect(() => {
+        const stored = localStorage.getItem("isLoggedIn") === "true";
+        setIsLoggedIn(stored);
+    }, []);
 
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="about" element={<About />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Layout/>}>
+                    {/* public routes */}
+                    <Route index element={<Home/>}/>
+                    <Route path="about" element={<About/>}/>
+                    <Route path="dashboard" element={<Dashboard/>}/>
+                    <Route path="login" element={<Login onLogin={() => setIsLoggedIn(true)}/>}/>
+
+                    {/* protected */}
+                    <Route
+                        path="profile"
+                        element={
+                            <ProtectedRoute isLoggedIn={isLoggedIn}>
+                                <Profile/>
+                            </ProtectedRoute>
+                        }
+                    />
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;
