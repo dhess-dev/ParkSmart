@@ -33,8 +33,8 @@ float distance;
 boolean isParkingSpotOccupied;
 
 // LED setup
-int ledRed = 16;
-int ledGreen = 17;
+const int ledRed = 16;
+const int ledGreen = 17;
 
 // MQTT Client and timer handles
 AsyncMqttClient mqttClient;
