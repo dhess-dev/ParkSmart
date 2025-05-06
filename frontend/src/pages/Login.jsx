@@ -15,26 +15,31 @@ function Login({onLogin}) {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        console.log("Login form submitted"); // <--- Add this
 
         try {
             const response = await fetch(`${apiUrl}/api/users/login`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded",
                 },
-                body: JSON.stringify({username, password}),
+                body: new URLSearchParams({
+                    username,
+                    password
+                }),
+                credentials: "include" // crucial for receiving session cookie!
             });
 
-            const result = await response.text();
 
-            if (response.ok && result === "Login successful") {
-                setMessage(result);
+            if (response.ok) {
+                setMessage("Login successful");
                 onLogin();
                 localStorage.setItem("isLoggedIn", "true");
-                navigate(from, {replace: true}); // 👈 go back to where user came from
+                navigate(from, { replace: true });
             } else {
                 setMessage(result);
             }
+
         } catch (error) {
             setMessage("An error occurred. Please try again.");
             console.error("Error:", error);

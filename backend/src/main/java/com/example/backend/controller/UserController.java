@@ -2,7 +2,12 @@ package com.example.backend.controller;
 
 import com.example.backend.models.User;
 import com.example.backend.repositories.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,17 +18,21 @@ import java.util.Map;
 public class UserController {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
     public List<User> getAllUsers() {
+        userRepository.findAll().forEach(u -> {
+            System.out.println("user = " + u.getUsername() + ", password = " + u.getPassword());
+        });
         return userRepository.findAll();
     }
+
 
     @PostMapping
     public User createUser(@RequestBody User user) {
@@ -34,21 +43,16 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    @PostMapping("/login")
-    public String login(@RequestBody Map<String, String> credentials) {
-        String username = credentials.get("username");
-        String password = credentials.get("password");
+    @GetMapping("/me")
+    public ResponseEntity<User> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
+        String username = authentication.getName();
         return userRepository.findByUsername(username)
-                .map(user -> {
-                    System.out.println("Raw password: " + password);
-                    System.out.println("Hashed password: " + user.getPassword());
-                    if (passwordEncoder.matches(password, user.getPassword())) {
-                        return "Login successful";
-                    } else {
-                        return "Invalid credentials";
-                    }
-                })
-                .orElse("Invalid credentials");
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
+
 }
