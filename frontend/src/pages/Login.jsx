@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import {TextField, Button, Typography, Box} from "@mui/material";
+import {useNavigate, useLocation} from "react-router-dom";
 
 const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
 
@@ -7,6 +8,10 @@ function Login({onLogin}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/profile"; // default fallback
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -25,6 +30,8 @@ function Login({onLogin}) {
             if (response.ok && result === "Login successful") {
                 setMessage(result);
                 onLogin();
+                localStorage.setItem("isLoggedIn", "true");
+                navigate(from, {replace: true}); // 👈 go back to where user came from
             } else {
                 setMessage(result);
             }
@@ -50,6 +57,7 @@ function Login({onLogin}) {
             <Typography variant="h4" component="h1" align="center">
                 Login
             </Typography>
+
             <TextField
                 label="Username"
                 variant="outlined"
@@ -57,6 +65,7 @@ function Login({onLogin}) {
                 onChange={(e) => setUsername(e.target.value)}
                 required
             />
+
             <TextField
                 label="Password"
                 type="password"
@@ -65,9 +74,11 @@ function Login({onLogin}) {
                 onChange={(e) => setPassword(e.target.value)}
                 required
             />
+
             <Button type="submit" variant="contained" color="secondary">
                 Login
             </Button>
+
             {message && (
                 <Typography color="error" align="center">
                     {message}
