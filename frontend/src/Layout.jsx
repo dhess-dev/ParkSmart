@@ -23,14 +23,12 @@ import {useState} from "react";
 
 const drawerWidth = 240;
 
-function Layout({setIsLoggedIn}) {
+function Layout({ setIsLoggedIn, isLoggedIn }) {
 
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const menuOpen = Boolean(anchorEl);
     const navigate = useNavigate();
-
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
     const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
     const handleDrawerClose = () => setMobileOpen(false);

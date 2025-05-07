@@ -24,8 +24,8 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Layout setIsLoggedIn={setIsLoggedIn}/>}>
-                    {/* public routes */}
+                <Route path="/" element={<Layout setIsLoggedIn={setIsLoggedIn} isLoggedIn={isLoggedIn} />}>
+                {/* public routes */}
                     <Route index element={<Home/>}/>
                     <Route path="about" element={<About/>}/>
                     <Route path="dashboard" element={<Dashboard/>}/>
