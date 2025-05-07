@@ -23,7 +23,7 @@ public class GateAccessController {
     }
 
     @GetMapping
-    public List<GateAccess> getAllCards() {
+    public List<GateAccess> getAllGateAccesses() {
         return repository.findAll();
     }
 

@@ -18,8 +18,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.example.backend.controller.GateAccessController;
-
 import jakarta.annotation.PostConstruct;
 
 @EnableAsync
@@ -35,19 +33,19 @@ public class ClientManager {
     private final String password;
     private final String clientId;
     private IMqttClient mqttClient;
-    private final GateAccessController gateAccessController;
+    private final CallbackHandler callbackHandler;
 
     public ClientManager(
             @Value("${MQTT_BROKER_URL:tcp://gruppe1iot.local:1883}") String mqttBrokerUrl,
             @Value("${MQTT_USERNAME:gruppe1}") String mqttUsername,
             @Value("${MQTT_PASSWORD:gruppe1}") String mqttPassword,
-            GateAccessController gateAccessController
+            CallbackHandler callbackHandler
     ) {
         this.brokerUrl = mqttBrokerUrl;
         this.username = mqttUsername;
         this.password = mqttPassword;
         this.clientId = "client_" + UUID.randomUUID().toString();
-        this.gateAccessController = gateAccessController;
+        this.callbackHandler = callbackHandler;
         logger.info("Using MQTT broker at: {}", this.brokerUrl);
     }
 
@@ -106,7 +104,7 @@ public class ClientManager {
     public void subscribeTopic(String topic) {
         try {
             if (mqttClient != null && mqttClient.isConnected()) {
-                mqttClient.setCallback(new CallbackHandler(this, gateAccessController));
+                mqttClient.setCallback(callbackHandler);
                 mqttClient.subscribe(topic);
                 logger.info("Subscribed to topic: {}", topic);
             }
