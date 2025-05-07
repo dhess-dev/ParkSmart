@@ -9,18 +9,23 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import {useState, useEffect} from "react";
 
 function App() {
+    const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        const stored = localStorage.getItem("isLoggedIn") === "true";
-        setIsLoggedIn(stored);
+        fetch(`${apiUrl}/api/users/me`, {
+            credentials: "include"
+        })
+            .then(res => setIsLoggedIn(res.ok))
+            .catch(() => setIsLoggedIn(false));
     }, []);
+
 
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Layout/>}>
-                    {/* public routes */}
+                <Route path="/" element={<Layout setIsLoggedIn={setIsLoggedIn} isLoggedIn={isLoggedIn} />}>
+                {/* public routes */}
                     <Route index element={<Home/>}/>
                     <Route path="about" element={<About/>}/>
                     <Route path="dashboard" element={<Dashboard/>}/>
