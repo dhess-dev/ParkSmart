@@ -1,5 +1,6 @@
 package com.example.backend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,10 +42,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Value("${CORS_Origin:${cors.allowed-origins}}") String origin;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://localhost:5173")); // your frontend
+        config.setAllowedOrigins(List.of(origin.split(",")));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // Required for session-based auth

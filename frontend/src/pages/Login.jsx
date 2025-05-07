@@ -15,7 +15,7 @@ function Login({onLogin}) {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        console.log("Login form submitted"); // <--- Add this
+        console.log("Login form submitted");
 
         try {
             const response = await fetch(`${apiUrl}/api/users/login`, {
@@ -27,7 +27,7 @@ function Login({onLogin}) {
                     username,
                     password
                 }),
-                credentials: "include" // crucial for receiving session cookie!
+                credentials: "include"
             });
 
 
@@ -37,7 +37,8 @@ function Login({onLogin}) {
                 localStorage.setItem("isLoggedIn", "true");
                 navigate(from, { replace: true });
             } else {
-                setMessage(result);
+                const errorText = await response.text(); // get the response content
+                setMessage(errorText); // show the server's error message
             }
 
         } catch (error) {

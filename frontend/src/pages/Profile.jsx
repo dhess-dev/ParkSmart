@@ -11,7 +11,7 @@ function Profile() {
     useEffect(() => {
         fetch(`${apiUrl}/api/users/me`, {
             method: "GET",
-            credentials: "include", // 👈 required for session-based login
+            credentials: "include",
         })
             .then(res => {
                 if (res.status === 401 || res.status === 403) {
