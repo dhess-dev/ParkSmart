@@ -23,14 +23,24 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/login", "/api/users").permitAll()
+                        .requestMatchers("/api/users/login",
+                                "/api/dashboard",
+                                "/api/users",
+                                "/api/users/me"
+                        ).permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
                         .loginProcessingUrl("/api/users/login")
                         .successHandler((req, res, auth) -> res.setStatus(200))
-                        .failureHandler((req, res, ex) -> res.sendError(401))
+                        .failureHandler((req, res, ex) -> res.sendError(401)))
+                .logout(logout -> logout
+                        .logoutUrl("/api/users/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")        // kill the JSESSIONID cookie
+                        .logoutSuccessHandler((req, res, auth) -> res.setStatus(200))
                 );
 
 
@@ -42,7 +52,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Value("${CORS_Origin:${cors.allowed-origins}}") String origin;
+    @Value("${CORS_Origin:${cors.allowed-origins}}")
+    String origin;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

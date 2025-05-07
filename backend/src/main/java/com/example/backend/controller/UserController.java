@@ -34,6 +34,7 @@ public class UserController {
 
         if (!user.getPassword().startsWith("$2a$")) {
             user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash the password
+            user.getRoles().add("USER");
         }
         return userRepository.save(user);
     }

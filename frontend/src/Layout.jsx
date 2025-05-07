@@ -1,66 +1,39 @@
-// src/Layout.jsx
 import {Outlet, Link, useNavigate} from "react-router-dom";
 import {
-    AppBar,
-    Box,
-    CssBaseline,
-    Divider,
-    Drawer,
-    IconButton,
-    List,
-    ListItem,
-    ListItemText,
-    Toolbar,
-    Typography,
-    Avatar,
-    Tooltip,
-    Menu,
-    MenuItem,
-    Button,
+    AppBar, Box, CssBaseline, Divider,
+    Drawer, IconButton, List, ListItem,
+    ListItemText, Toolbar, Typography,
+    Avatar, Tooltip, Menu, MenuItem, Button
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import {useState} from "react";
 
-const drawerWidth = 240;
-
-function Layout({ setIsLoggedIn, isLoggedIn }) {
-
+export default function Layout({user, onLogout}) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
-    const menuOpen = Boolean(anchorEl);
     const navigate = useNavigate();
-
-    const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
-    const handleDrawerClose = () => setMobileOpen(false);
-    const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);
-    const handleMenuClose = () => setAnchorEl(null);
-
-    const handleLogout = () => {
-        localStorage.removeItem("isLoggedIn");
-        setIsLoggedIn(false);
-        handleMenuClose();
-        navigate("/login");
-    };
 
     const drawer = (
         <Box sx={{textAlign: "center"}}>
-            <Typography variant="h6" sx={{my: 2}}>
-                My App
-            </Typography>
+            <Typography variant="h6" sx={{my: 2}}>My App</Typography>
             <Divider/>
             <List>
                 {[
                     {label: "Home", to: "/"},
                     {label: "About", to: "/about"},
                     {label: "Dashboard", to: "/dashboard"},
-                    {label: "Profile", to: "/profile"},
-                ].map((item) => (
+                    ...(user ? [
+                        {label: "Profile", to: "/profile"},
+                        ...(user.roles.includes("ADMIN")
+                            ? [{label: "Admin", to: "/admin"}]
+                            : []),
+                    ] : []),
+                ].map(item => (
                     <ListItem
-                        button
-                        key={item.to}
+                        button key={item.to}
                         component={Link}
                         to={item.to}
-                        onClick={handleDrawerClose}
+                        onClick={() => setMobileOpen(false)}
                     >
                         <ListItemText primary={item.label}/>
                     </ListItem>
@@ -72,59 +45,55 @@ function Layout({ setIsLoggedIn, isLoggedIn }) {
     return (
         <Box sx={{display: "flex"}}>
             <CssBaseline/>
-
             <AppBar position="fixed" sx={{zIndex: 1201}}>
                 <Toolbar>
                     <IconButton
-                        color="inherit"
-                        edge="start"
-                        onClick={handleDrawerToggle}
+                        color="inherit" edge="start"
+                        onClick={() => setMobileOpen(o => !o)}
                         sx={{mr: 2}}
                     >
                         <MenuIcon/>
                     </IconButton>
 
-                    <Typography variant="h6" noWrap component="div">
-                        Dashboard
-                    </Typography>
-
+                    <Typography variant="h6" noWrap>Dashboard</Typography>
                     <Box sx={{flexGrow: 1}}/>
 
-                    {isLoggedIn ? (
+                    {user ? (
                         <>
-                            <Tooltip title="Open settings">
-                                <IconButton onClick={handleAvatarClick} sx={{p: 0}}>
-                                    <Avatar sx={{bgcolor: "secondary.main"}}>U</Avatar>
+                            <Tooltip title="User menu">
+                                <IconButton onClick={e => setAnchorEl(e.currentTarget)} sx={{p: 0}}>
+                                    <Avatar>{user.username[0].toUpperCase()}</Avatar>
                                 </IconButton>
                             </Tooltip>
-
                             <Menu
                                 anchorEl={anchorEl}
-                                open={menuOpen}
-                                onClose={handleMenuClose}
-                                onClick={handleMenuClose}
-                                PaperProps={{
-                                    elevation: 3,
-                                    sx: {mt: 1.5, minWidth: 160},
-                                }}
-                                anchorOrigin={{
-                                    vertical: "bottom",
-                                    horizontal: "right",
-                                }}
-                                transformOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
-                                }}
+                                open={Boolean(anchorEl)}
+                                onClose={() => setAnchorEl(null)}
                             >
-                                <MenuItem onClick={() => navigate("/profile")}>My Info</MenuItem>
-                                <MenuItem>My Billing</MenuItem>
-                                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                                <MenuItem onClick={() => {
+                                    setAnchorEl(null);
+                                    navigate("/profile");
+                                }}>
+                                    Profile
+                                </MenuItem>
+                                {user.roles.includes("ADMIN") && (
+                                    <MenuItem onClick={() => {
+                                        setAnchorEl(null);
+                                        navigate("/admin");
+                                    }}>
+                                        Admin
+                                    </MenuItem>
+                                )}
+                                <MenuItem onClick={() => {
+                                    setAnchorEl(null);
+                                    onLogout();
+                                }}>
+                                    Logout
+                                </MenuItem>
                             </Menu>
                         </>
                     ) : (
-                        <Button color="inherit" component={Link} to="/login">
-                            Login
-                        </Button>
+                        <Button component={Link} to="/login" color="inherit">Login</Button>
                     )}
                 </Toolbar>
             </AppBar>
@@ -132,32 +101,17 @@ function Layout({ setIsLoggedIn, isLoggedIn }) {
             <Drawer
                 variant="temporary"
                 open={mobileOpen}
-                onClose={handleDrawerClose}
+                onClose={() => setMobileOpen(false)}
                 ModalProps={{keepMounted: true}}
-                sx={{
-                    display: {xs: "block", sm: "block"},
-                    "& .MuiDrawer-paper": {
-                        boxSizing: "border-box",
-                        width: drawerWidth,
-                    },
-                }}
+                sx={{"& .MuiDrawer-paper": {width: 240}}}
             >
                 {drawer}
             </Drawer>
 
-            <Box
-                component="main"
-                sx={{
-                    flexGrow: 1,
-                    p: 3,
-                    width: "100%",
-                }}
-            >
+            <Box component="main" sx={{flexGrow: 1, p: 3}}>
                 <Toolbar/>
                 <Outlet/>
             </Box>
         </Box>
     );
 }
-
-export default Layout;
