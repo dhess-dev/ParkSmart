@@ -7,20 +7,34 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import com.example.backend.controller.GateAccessController;
+import com.example.backend.models.ParkingSpot;
+import com.example.backend.repositories.ParkingSpotRepository;
 
+@Component
 public class CallbackHandler implements MqttCallback {
 
-    private final GateAccessController gateAccessController;
-    private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(CallbackHandler.class);
 
-    private final ClientManager mqttClientManager;
+    private final GateAccessController gateAccessController;
+    private final ParkingSpotRepository parkingSpotRepository;
+
+    private ClientManager mqttClientManager;
+
     private boolean isSpotOccupied;
 
-    public CallbackHandler(ClientManager mqttClientManager, GateAccessController gateAccessController) {
-        this.mqttClientManager = mqttClientManager;
+    public CallbackHandler(GateAccessController gateAccessController, ParkingSpotRepository parkingSpotRepository) {
         this.gateAccessController = gateAccessController;
+        this.parkingSpotRepository = parkingSpotRepository;
+    }
+
+    @Autowired
+    public void setClientManager(@Lazy ClientManager mqttClientManager) {
+        this.mqttClientManager = mqttClientManager;
     }
 
     @Override
@@ -39,12 +53,19 @@ public class CallbackHandler implements MqttCallback {
             }
         }
 
-        if (topic.equals("backend/parking/spot/distance")) {
+        if (topic.equals("backend/parking/spot/A1/distance")) {
             String payload = new String(message.getPayload());
             float distance = Float.parseFloat(payload);
             if ((distance <= 5) != isSpotOccupied) {
                 isSpotOccupied = (distance <= 5);
-                mqttClientManager.publishMessage("cps/parking/spot/isOccupied", isSpotOccupied ? "1" : "0");
+                ParkingSpot parkingSpot = parkingSpotRepository.findByPosition("A1").orElse(null);
+                if (parkingSpot == null) {
+                    parkingSpot = new ParkingSpot();
+                    parkingSpot.setPosition("A1");
+                }
+                parkingSpot.setIsOccupied(isSpotOccupied);
+                parkingSpotRepository.save(parkingSpot);
+                mqttClientManager.publishMessage("cps/parking/spot/A1/isOccupied", isSpotOccupied ? "1" : "0");
             }
         }
     }
