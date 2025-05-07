@@ -38,7 +38,7 @@ public class ParkingSpot {
         this.isOccupied = isOccupied;
     }
 
-    public boolean getIsOccupied() {
+    public boolean isOccupied() {
         return isOccupied;
     }
 
