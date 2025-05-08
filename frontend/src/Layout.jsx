@@ -3,12 +3,12 @@ import {
     AppBar, Box, CssBaseline, Divider,
     Drawer, IconButton, List, ListItem,
     ListItemText, Toolbar, Typography,
-    Avatar, Tooltip, Menu, MenuItem, Button
+    Avatar, Tooltip, Menu, MenuItem, Button, Switch
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import {useState} from "react";
 
-export default function Layout({user, onLogout}) {
+export default function Layout({user, onLogout, mode, setMode}) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const navigate = useNavigate();
@@ -57,6 +57,13 @@ export default function Layout({user, onLogout}) {
 
                     <Typography variant="h6" noWrap>Dashboard</Typography>
                     <Box sx={{flexGrow: 1}}/>
+
+                    {/* Theme Switch */}
+                    <Switch
+                        checked={mode === "dark"}
+                        onChange={() => setMode(mode === "light" ? "dark" : "light")}
+                        color="default"
+                    />
 
                     {user ? (
                         <>
