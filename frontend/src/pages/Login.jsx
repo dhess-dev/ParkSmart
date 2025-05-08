@@ -22,10 +22,15 @@ export default function Login({onLogin}) {
         });
 
         if (res.ok) {
-            await onLogin();                // re-fetch `/me` in App
+            await onLogin();
             navigate("/");
         } else {
-            setError("Login failed");
+            try {
+                const errorData = await res.json();
+                setError(errorData.error || "Login failed");
+            } catch {
+                setError("Login failed");
+            }
         }
     };
 

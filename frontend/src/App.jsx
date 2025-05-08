@@ -58,8 +58,12 @@ export default function App() {
                         element={<Login onLogin={() => {
                             // after successful login, re-fetch /me:
                             fetch(`${apiUrl}/api/users/me`, {credentials: "include"})
-                                .then(r => r.json())
-                                .then(setUser);
+                                .then(r => {
+                                    if (!r.ok) throw new Error("Failed to fetch user data");
+                                    return r.json();
+                                })
+                                .then(setUser)
+                                .catch(() => setUser(null));
                         }}/>}
                     />
 
