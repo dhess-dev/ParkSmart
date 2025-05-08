@@ -1,97 +1,51 @@
 import React, {useState} from "react";
 import {TextField, Button, Typography, Box} from "@mui/material";
-import {useNavigate, useLocation} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
-const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
+export default function Login({onLogin}) {
+    const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
 
-function Login({onLogin}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
-
+    const [error, setError] = useState("");
     const navigate = useNavigate();
-    const location = useLocation();
-    const from = location.state?.from?.pathname || "/profile"; // default fallback
 
-    const handleLogin = async (e) => {
+    const handleSubmit = async e => {
         e.preventDefault();
-        console.log("Login form submitted");
+        setError("");
 
-        try {
-            const response = await fetch(`${apiUrl}/api/users/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    username,
-                    password
-                }),
-                credentials: "include"
-            });
+        const res = await fetch(`${apiUrl}/api/users/login`, {
+            method: "POST",
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            body: new URLSearchParams({username, password}),
+            credentials: "include",
+        });
 
-
-            if (response.ok) {
-                setMessage("Login successful");
-                onLogin();
-                localStorage.setItem("isLoggedIn", "true");
-                navigate(from, { replace: true });
-            } else {
-                const errorText = await response.text(); // get the response content
-                setMessage(errorText); // show the server's error message
-            }
-
-        } catch (error) {
-            setMessage("An error occurred. Please try again.");
-            console.error("Error:", error);
+        if (res.ok) {
+            await onLogin();                // re-fetch `/me` in App
+            navigate("/");
+        } else {
+            setError("Login failed");
         }
     };
 
     return (
         <Box
             component="form"
-            onSubmit={handleLogin}
-            sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                maxWidth: 400,
-                margin: "auto",
-                mt: 5,
-            }}
+            onSubmit={handleSubmit}
+            sx={{maxWidth: 400, mx: "auto", mt: 5, display: "flex", flexDirection: "column", gap: 2}}
         >
-            <Typography variant="h4" component="h1" align="center">
-                Login
-            </Typography>
-
+            <Typography variant="h4" align="center">Login</Typography>
             <TextField
-                label="Username"
-                variant="outlined"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
+                label="Username" value={username}
+                onChange={e => setUsername(e.target.value)} required
             />
-
             <TextField
-                label="Password"
-                type="password"
-                variant="outlined"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                label="Password" type="password" value={password}
+                onChange={e => setPassword(e.target.value)} required
             />
-
-            <Button type="submit" variant="contained" color="secondary">
-                Login
-            </Button>
-
-            {message && (
-                <Typography color="error" align="center">
-                    {message}
-                </Typography>
-            )}
+            <Button type="submit" variant="contained">Log In</Button>
+            {error && <Typography color="error">{error}</Typography>}
         </Box>
     );
 }
-
-export default Login;
