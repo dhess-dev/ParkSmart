@@ -6,8 +6,8 @@
 #include <ESP32Servo.h>
 
 // WiFi configuration
-const char *ssid = "FES-SuS";
-const char *password = "SuS-WLAN!Key24";
+const char *ssid = "WLAN-571794";
+const char *password = "93940861556538256318";
 
 // MQTT configuration
 const char *mqtt_server = "gruppe1iot.local";
@@ -21,15 +21,21 @@ MFRC522DriverSPI driver{ss_pin};
 MFRC522 mfrc522{driver};
 
 // Servo motor setup
-Servo servo;
-const int servoPin = 18;
+Servo servoEntryGate;
+const int servoEntryPin = 18;
+Servo servoExitGate;
+const int servoExitPin = 15;
 
 // Ultra sonic setup
 const int trigPin = 5;
+const int trigPin2 = 4;
 const int echoPin = 7;
+const int echoPin2 = 6;
 #define SOUND_SPEED 0.034
-long duration;
-float distance;
+long durationA1;
+long durationGate;
+float distanceA1;
+float distanceGate;
 boolean isParkingSpotOccupied;
 
 // LED setup
@@ -40,7 +46,7 @@ const int ledGreen = 17;
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
-TimerHandle_t gateCloseTimer;
+TimerHandle_t closeExitGateTimer;
 
 // Connect to WiFi
 void connectToWifi()
@@ -100,36 +106,43 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
   }
 }
 
-// Timer callback to close the gate after a delay
-void closeGate(TimerHandle_t xTimer)
-{
-  Serial.println("Closing gate...");
-  // Rotate servo back to 0 degrees to close the gate
-  servo.write(0);
-}
-
 // MQTT message callback
 void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
 {
-  if (strcmp(topic, "cps/parking/gate/open") == 0)
-  {
-    Serial.println("Opening gate...");
-    // Rotate servo to 90 degrees to open the gate
-    servo.write(90);
-    // Start timer to close the gate after 6 seconds
-    xTimerStart(gateCloseTimer, 0);
-  }
-  if (strcmp(topic, "cps/parking/spot/isOccupied") == 0)
+  if (strcmp(topic, "cps/parking/gate/entry/open") == 0)
   {
     if (payload[0] == '1')
     {
-      // Parking spot occupied -> set LED red
+      Serial.println("Opening entry gate...");
+      // Rotate servo to 90 degrees to open the entry gate
+      servoEntryGate.write(90);
+    }
+    else
+    {
+      Serial.println("Closing entry gate...");
+      // Rotate servo back to 0 degrees to close the entry gate
+      servoEntryGate.write(0);
+    }
+  }
+  if (strcmp(topic, "cps/parking/gate/exit/open") == 0)
+  {
+    if (payload[0] == '1')
+    {
+      Serial.println("Opening exit gate...");
+      // Rotate servo to 90 degrees to open the exit gate
+      servoExitGate.write(90);
+      xTimerStart(closeExitGateTimer, 0);
+    }
+  }
+  if (strcmp(topic, "cps/parking/spot/A1/isOccupied") == 0)
+  {
+    if (payload[0] == '1')
+    {
       digitalWrite(ledRed, HIGH);
       digitalWrite(ledGreen, LOW);
     }
-    else if (payload[0] == '0')
+    else
     {
-      // Parking spot not occupied -> Set LED green
       digitalWrite(ledRed, LOW);
       digitalWrite(ledGreen, HIGH);
     }
@@ -146,6 +159,15 @@ void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties 
   Serial.println();
 }
 
+void closeExitGate(TimerHandle_t xTimer)
+{
+  Serial.println("Closing exit gate...");
+  // Rotate servo back to 0 degrees to close the exit gate
+  servoExitGate.write(0);
+  String payload = "0";
+  mqttClient.publish("backend/parking/gate/exit/open", 0, false, payload.c_str());
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -153,14 +175,16 @@ void setup()
 
   // Setup RFID
   mfrc522.PCD_Init();
-  Serial.println(F("Scan PICC To See UID Of RFID-Chip"));
+  Serial.println(F("Scan PICC to see UID..."));
 
   // Setup Servo motor
-  servo.attach(servoPin);
-
+  servoEntryGate.attach(servoEntryPin);
+  servoExitGate.attach(servoExitPin);
   // Setup ultrao sonic
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  pinMode(trigPin2, OUTPUT);
+  pinMode(echoPin2, INPUT);
 
   // Setup LED
   pinMode(ledRed, OUTPUT);
@@ -169,7 +193,7 @@ void setup()
   // Setup timers for MQTT, WiFi, and gate close
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
-  gateCloseTimer = xTimerCreate("gateTimer", pdMS_TO_TICKS(6000), pdFALSE, (void *)0, closeGate);
+  closeExitGateTimer = xTimerCreate("gateTimer", pdMS_TO_TICKS(5000), pdFALSE, (void *)0, closeExitGate);
 
   // Setup WiFi event handler
   WiFi.onEvent(WiFiEvent);
@@ -212,27 +236,36 @@ void loop()
     mfrc522.PCD_StopCrypto1();
   }
 
-  // --- Ultrasonic: Measure distance and publish ---
-  // Clears the trigPin
+  // Sensor 1
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
-  // Sets the trigPin on HIGH state for 10 micro seconds
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
+  durationA1 = pulseIn(echoPin, HIGH);
+  distanceA1 = durationA1 * SOUND_SPEED / 2;
 
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPin, HIGH);
+  delay(50);
 
-  // Calculate the distance
-  distance = duration * SOUND_SPEED / 2;
+  // Sensor 2
+  digitalWrite(trigPin2, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin2, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin2, LOW);
+  durationGate = pulseIn(echoPin2, HIGH);
+  distanceGate = durationGate * SOUND_SPEED / 2;
 
-  Serial.print("Distance (cm): ");
-  Serial.println(distance);
+  Serial.print("DistanceA1 (cm): ");
+  Serial.println(distanceA1);
+  Serial.print("DistanceGate (cm SECOND): ");
+  Serial.println(distanceGate);
 
-  String payload = String(distance, 2);
-  mqttClient.publish("backend/parking/spot/distance", 0, false, payload.c_str());
+  String payloadA1 = String(distanceA1, 2);
+  String payloadGate = String(distanceGate, 2);
+  mqttClient.publish("backend/parking/spot/A1/distance", 0, false, payloadA1.c_str());
+  mqttClient.publish("backend/parking/gate/distance", 0, false, payloadGate.c_str());
 
   // Small delay to avoid overloading the loop
-  delay(200);
+  delay(1000);
 }
