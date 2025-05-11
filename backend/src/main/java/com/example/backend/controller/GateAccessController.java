@@ -3,7 +3,6 @@ package com.example.backend.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,13 +26,12 @@ public class GateAccessController {
         return repository.findAll();
     }
 
-    @GetMapping("/{rfidCode}")
-    public GateAccess getCardByRfidCode(@PathVariable String rfidCode) {
+    public GateAccess getGateAccessByRfidCode(String rfidCode) {
         return repository.findByRfidCode(rfidCode).orElse(null);
     }
 
     @PostMapping
-    public GateAccess createCard(@RequestBody GateAccess gateAccess) {
+    public GateAccess createGateAccess(@RequestBody GateAccess gateAccess) {
         return repository.save(gateAccess);
     }
 }

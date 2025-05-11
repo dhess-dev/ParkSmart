@@ -146,3 +146,42 @@ Unnecessary files like node_modules/, build/, .gradle/, etc. are excluded using 
 ```bash
 chrome.exe --ignore-certificate-errors
 ```
+
+### Pins for cps
+
+RFID Reader:
+SDA: 8
+MOSI: 11
+MISO: 13
+SCK: 12
+
+Ultra sonic (parking spot):
+VCC: 5V
+TRIG: 5
+ECHO: 7
+
+Ultra sonic (gate):
+VCC: 5V
+TRIG: 4
+ECHO: 6
+
+Servo Motor Entry Gate
+Brown: GND
+Red: VCC -> 5V
+Orange: PWM: 18
+
+Servo Motor Exit Gate
+Brown: GND
+Red: VCC -> 5V
+Orange: PWM: 15
+
+LED
+red: 16 (Mit Resistor)
+green: 17 (Mit Resistor)
+Rechts Ground
+
+ESP32 Cam (ESP32 Wrover Kit (all kits))
+gnd:gnd
+5V: 5V
+RX:U0T
+TX: U0R
