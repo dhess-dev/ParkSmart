@@ -1,18 +1,21 @@
 package com.example.backend.config;
 
+import com.example.backend.models.ParkingSpot;
 import com.example.backend.models.User;
+import com.example.backend.repositories.ParkingSpotRepository;
 import com.example.backend.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
 import java.util.Set;
 
 @Configuration
 public class InitialAdminConfig {
 
     @Bean
-    CommandLineRunner createAdmin(UserRepository userRepository) {
+    CommandLineRunner createAdmin(UserRepository userRepository, ParkingSpotRepository parkingSpotRepository) {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()) {
                 User admin = new User();
@@ -39,6 +42,26 @@ public class InitialAdminConfig {
                     );
                 }
             }
+            if (parkingSpotRepository.count() == 0) {
+                List<String> positions = List.of(
+                        "A1", "A2", "A3", "A4", "A5",
+                        "B1", "B2", "B3", "B4", "B5"
+                );
+
+                for (int i = 0; i < positions.size(); i++) {
+                    ParkingSpot spot = new ParkingSpot();
+                    spot.setPosition(positions.get(i));
+                    spot.setOccupied(i != 0);
+                    parkingSpotRepository.save(spot);
+                }
+                System.out.println("Seeded " + positions.size() + " parking spots (only A1 is free).");
+            } else {
+                System.out.println("Parking spots already exist: count=" +
+                        parkingSpotRepository.count());
+            }
         };
+
+
     }
 }
+
