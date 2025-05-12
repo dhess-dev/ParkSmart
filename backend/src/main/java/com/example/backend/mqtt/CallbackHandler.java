@@ -3,6 +3,7 @@ package com.example.backend.mqtt;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 
+import com.example.backend.controller.ParkingSpotController;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -17,7 +18,6 @@ import com.example.backend.controller.GateAccessController;
 import com.example.backend.models.ParkingEvent;
 import com.example.backend.models.ParkingSpot;
 import com.example.backend.repositories.ParkingEventRepository;
-import com.example.backend.repositories.ParkingSpotRepository;
 
 @Component
 public class CallbackHandler implements MqttCallback {
@@ -25,15 +25,15 @@ public class CallbackHandler implements MqttCallback {
     private static final Logger logger = LoggerFactory.getLogger(CallbackHandler.class);
 
     private final GateAccessController gateAccessController;
-    private final ParkingSpotRepository parkingSpotRepository;
+    private final ParkingSpotController parkingSpotController;
     private final ParkingEventRepository parkingEventRepository;
     private final Parking parking = new Parking();
 
     private ClientManager mqttClientManager;
 
-    public CallbackHandler(GateAccessController gateAccessController, ParkingSpotRepository parkingSpotRepository, ParkingEventRepository parkingEventRepository) {
+    public CallbackHandler(GateAccessController gateAccessController, ParkingSpotController parkingSpotController, ParkingEventRepository parkingEventRepository) {
         this.gateAccessController = gateAccessController;
-        this.parkingSpotRepository = parkingSpotRepository;
+        this.parkingSpotController = parkingSpotController;
         this.parkingEventRepository = parkingEventRepository;
     }
 
@@ -65,13 +65,7 @@ public class CallbackHandler implements MqttCallback {
             float distance = Float.parseFloat(payload);
             if ((distance <= 5) != parking.isSpotOccupied()) {
                 parking.setSpotOccupied(distance <= 5);
-                ParkingSpot parkingSpot = parkingSpotRepository.findByPosition("A1").orElse(null);
-                if (parkingSpot == null) {
-                    parkingSpot = new ParkingSpot();
-                    parkingSpot.setPosition("A1");
-                }
-                parkingSpot.setOccupied(parking.isSpotOccupied());
-                parkingSpotRepository.save(parkingSpot);
+                ParkingSpot parkingSpot = parkingSpotController.updateSpot("A1");
                 mqttClientManager.publishMessage("cps/parking/spot/A1/isOccupied", parking.isSpotOccupied() ? "1" : "0");
             }
         }
