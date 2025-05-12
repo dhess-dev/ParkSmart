@@ -54,8 +54,17 @@ public class CallbackHandler implements MqttCallback {
         if (topic.equals("backend/parking/gate/validation/rfid")) {
             String cardCode = new String(message.getPayload(), StandardCharsets.UTF_8);
             if (gateAccessController.getGateAccessByRfidCode(cardCode) != null) {
-                parking.setIdentificationCode(cardCode);
                 parking.setEntryGateOpened(true);
+                parking.setIdentificationCode(cardCode);
+                mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
+            }
+        }
+
+        if (topic.equals("backend/parking/gate/validation/qrCode")) {
+            String qrCode = new String(message.getPayload(), StandardCharsets.UTF_8);
+            if (gateAccessController.getGateAccessByQrCode(qrCode) != null && !parking.isEntryGateOpened()) {
+                parking.setEntryGateOpened(true);
+                parking.setIdentificationCode(qrCode);
                 mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
             }
         }
