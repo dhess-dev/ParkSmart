@@ -3,7 +3,7 @@ import { Box, Paper, Typography, useTheme } from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { grey, green } from "@mui/material/colors";
 
-function useParkingSpots(apiUrl, intervalMs = 5000) {
+function useParkingSpots(apiUrl, intervalMs = 1000) {
     const [spots, setSpots] = useState([]);
 
     useEffect(() => {
