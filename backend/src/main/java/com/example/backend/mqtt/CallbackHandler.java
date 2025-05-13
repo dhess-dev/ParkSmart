@@ -1,9 +1,7 @@
 package com.example.backend.mqtt;
 
 import java.nio.charset.StandardCharsets;
-import java.time.OffsetDateTime;
 
-import com.example.backend.controller.ParkingSpotController;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -15,9 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.backend.Parking;
 import com.example.backend.controller.GateAccessController;
-import com.example.backend.models.ParkingEvent;
-import com.example.backend.models.ParkingSpot;
-import com.example.backend.repositories.ParkingEventRepository;
+import com.example.backend.controller.ParkingSpotController;
 
 @Component
 public class CallbackHandler implements MqttCallback {
@@ -26,15 +22,14 @@ public class CallbackHandler implements MqttCallback {
 
     private final GateAccessController gateAccessController;
     private final ParkingSpotController parkingSpotController;
-    private final ParkingEventRepository parkingEventRepository;
-    private final Parking parking = new Parking();
+    private final Parking parking;
 
     private ClientManager mqttClientManager;
 
-    public CallbackHandler(GateAccessController gateAccessController, ParkingSpotController parkingSpotController, ParkingEventRepository parkingEventRepository) {
+    public CallbackHandler(GateAccessController gateAccessController, ParkingSpotController parkingSpotController, Parking parking) {
         this.gateAccessController = gateAccessController;
         this.parkingSpotController = parkingSpotController;
-        this.parkingEventRepository = parkingEventRepository;
+        this.parking = parking;
     }
 
     @Autowired
@@ -49,9 +44,10 @@ public class CallbackHandler implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        mqttClientManager.handleReceivedMessage(topic, message);
+    mqttClientManager.handleReceivedMessage(topic, message);
 
-        if (topic.equals("backend/parking/gate/validation/rfid")) {
+    switch (topic) {
+        case "backend/parking/gate/validation/rfid" ->  {
             String cardCode = new String(message.getPayload(), StandardCharsets.UTF_8);
             if (gateAccessController.getGateAccessByRfidCode(cardCode) != null) {
                 parking.setIdentificationCode(cardCode);
@@ -60,46 +56,47 @@ public class CallbackHandler implements MqttCallback {
             }
         }
 
-        if (topic.equals("backend/parking/spot/A1/distance")) {
+        case "backend/parking/spot/A1/distance" ->  {
             String payload = new String(message.getPayload());
             float distance = Float.parseFloat(payload);
             if ((distance <= 5) != parking.isSpotOccupied()) {
                 parking.setSpotOccupied(distance <= 5);
-                ParkingSpot parkingSpot = parkingSpotController.updateSpot("A1");
+                parkingSpotController.updateSpot("A1");
                 mqttClientManager.publishMessage("cps/parking/spot/A1/isOccupied", parking.isSpotOccupied() ? "1" : "0");
             }
         }
-        if (topic.equals("backend/parking/gate/distance")) {
+
+        case "backend/parking/gate/distance" ->  {
             String payload = new String(message.getPayload());
             float distance = Float.parseFloat(payload);
 
             if ((distance <= 5) && parking.isEntryGateOpened()) {
                 mqttClientManager.publishMessage("cps/parking/gate/entry/open", "0");
                 parking.setEntryGateOpened(false);
-                logParkingEvent("entry");
+                parking.logParkingEvent("entry");
+                parking.createParkingStatusEntry();
+                parking.updateParkingCountEntry();
             }
+
             boolean isCarInRange = distance > 5 && distance <= 10;
             if (isCarInRange && !parking.isExitGateOpened()) {
                 mqttClientManager.publishMessage("cps/parking/gate/exit/open", "1");
                 parking.setExitGateOpened(true);
-                logParkingEvent("exit");
+                parking.logParkingEvent("exit");
+                parking.createParkingStatusEntry();
+                parking.updateParkingCountEntry();
             }
         }
-        if (topic.equals("backend/parking/gate/exit/open")) {
+
+        case "backend/parking/gate/exit/open" ->  {
             String payload = new String(message.getPayload());
             parking.setExitGateOpened(payload.equals("1"));
         }
     }
+}
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
         // nothing to do
-    }
-
-    private void logParkingEvent(String eventType) {
-        ParkingEvent event = new ParkingEvent();
-        event.setTimestamp(OffsetDateTime.now());
-        event.setEvent(eventType);
-        parkingEventRepository.save(event);
     }
 }
