@@ -122,7 +122,7 @@ void setup()
     mqttClientCam.onMessage(onMqttMessage);
     mqttClientCam.setServer(mqtt_server, mqtt_port);
     mqttClientCam.setCredentials(mqtt_user, mqtt_password);
-    mqttClientCam.setClientId("ESP32Client");
+    mqttClientCam.setClientId("ESP32ClientCam");
 
     // Connect to WiFi
     connectToWifi();
