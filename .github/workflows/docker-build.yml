@@ -50,6 +50,10 @@ jobs:
         working-directory: backend
         run: ./gradlew test
 
+      - name: Decode and save keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > backend/src/main/resources/keystore.p12
+
       - name: Start backend server
         working-directory: backend
         run: ./gradlew bootRun &
