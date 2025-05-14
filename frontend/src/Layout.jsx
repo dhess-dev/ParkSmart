@@ -88,56 +88,61 @@ export default function Layout({ user, onLogout, mode, setMode }) {
             color="default"
           />
 
-          {user ? (
-            <>
-              <Tooltip title="User menu">
-                <IconButton
-                  onClick={(e) => setAnchorEl(e.currentTarget)}
-                  sx={{ p: 0 }}
-                >
-                  <Avatar>{user.username[0].toUpperCase()}</Avatar>
-                </IconButton>
-              </Tooltip>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={() => setAnchorEl(null)}
-              >
-                <MenuItem
-                  onClick={() => {
-                    setAnchorEl(null);
-                    navigate("/profile");
-                  }}
-                >
-                  Profile
-                </MenuItem>
-                {user.roles.includes("ADMIN") && (
-                  <MenuItem
-                    onClick={() => {
-                      setAnchorEl(null);
-                      navigate("/admin");
-                    }}
-                  >
-                    Admin
-                  </MenuItem>
-                )}
-                <MenuItem
-                  onClick={() => {
-                    setAnchorEl(null);
-                    onLogout();
-                  }}
-                >
-                  Logout
-                </MenuItem>
-              </Menu>
-            </>
-          ) : (
-            <Button component={Link} to="/login" color="inherit">
-              Login
-            </Button>
-          )}
-        </Toolbar>
-      </AppBar>
+                    {user ? (
+                        <>
+                            <Tooltip title="User menu">
+                                <IconButton onClick={e => setAnchorEl(e.currentTarget)} sx={{p: 0}}>
+                                    <Avatar>{user.username[0].toUpperCase()}</Avatar>
+                                </IconButton>
+                            </Tooltip>
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={() => setAnchorEl(null)}
+                            >
+                                <MenuItem onClick={() => {
+                                    setAnchorEl(null);
+                                    navigate("/profile");
+                                }}>
+                                    Profile
+                                </MenuItem>
+                                {user.roles.includes("ADMIN") && (
+                                    <MenuItem onClick={() => {
+                                        setAnchorEl(null);
+                                        navigate("/admin");
+                                    }}>
+                                        Admin
+                                    </MenuItem>
+                                )}
+                                <MenuItem onClick={() => {
+                                    setAnchorEl(null);
+                                    onLogout();
+                                }}>
+                                    Logout
+                                </MenuItem>
+                            </Menu>
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                component={Link}
+                                to="/register"
+                                color="inherit"
+                                sx={{mr: 1}}
+                            >
+                                Register
+                            </Button>
+                            <Button
+                                component={Link}
+                                to="/login"
+                                color="inherit"
+                            >
+                                Login
+                            </Button>
+                        </>
+                    )}
+                </Toolbar>
+            </AppBar>
 
       <Drawer
         variant="temporary"
