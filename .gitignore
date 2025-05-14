@@ -25,6 +25,7 @@ backend/.project
 backend/.settings/
 backend/.vscode/
 backend/.DS_Store
+backend/client_*
 # === SYSTEM ===
 *.swp
 *~
@@ -33,4 +34,5 @@ backend/.DS_Store
 *.temp
 *.sublime-workspace
 *.sublime-project
+
 
