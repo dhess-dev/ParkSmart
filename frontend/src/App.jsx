@@ -13,6 +13,8 @@ import Login from "./pages/Login";
 import Bookings from "./pages/Bookings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import Register from "./pages/Register.jsx";
+import Plans from "./pages/Plans.jsx";
 
 export default function App() {
   const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
@@ -45,7 +47,7 @@ export default function App() {
       .then(setUser)
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
-  }, []);
+  }, [apiUrl]);
 
   if (loading) return <p>Loading…</p>;
 
