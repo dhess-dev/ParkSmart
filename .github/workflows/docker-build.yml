@@ -60,7 +60,7 @@ jobs:
 
       - name: Run frontend tests
         working-directory: frontend
-        run: npm test -- --watchAll=false
+        run: npm test
 
       - name: Build backend JAR
         working-directory: backend
