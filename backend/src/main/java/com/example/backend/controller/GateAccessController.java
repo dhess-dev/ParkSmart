@@ -30,6 +30,10 @@ public class GateAccessController {
         return repository.findByRfidCode(rfidCode).orElse(null);
     }
 
+    public GateAccess getGateAccessByQrCode(String qrCode) {
+        return repository.findByQrCodeContent(qrCode).orElse(null);
+    }
+
     @PostMapping
     public GateAccess createGateAccess(@RequestBody GateAccess gateAccess) {
         return repository.save(gateAccess);
