@@ -6,6 +6,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.backend.models.User;
+
 @Entity
 @Table(name = "users")
 public class User {
