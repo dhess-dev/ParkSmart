@@ -2,9 +2,9 @@ name: Build, Test, and Push to GitHub Container Registry
 
 on:
   push:
-    branches: ["82-tests-in-git-runner-ausführen"]
+    branches: ["main"]
   pull_request:
-    branches: ["82-tests-in-git-runner-ausführen"]
+    branches: ["main"]
 
 jobs:
   build:
