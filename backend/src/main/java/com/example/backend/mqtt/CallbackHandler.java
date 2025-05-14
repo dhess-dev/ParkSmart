@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.example.backend.Parking;
 import com.example.backend.controller.GateAccessController;
 import com.example.backend.controller.ParkingSpotController;
+import com.example.backend.services.ParkingService;
 
 @Component
 public class CallbackHandler implements MqttCallback {
@@ -22,11 +22,11 @@ public class CallbackHandler implements MqttCallback {
 
     private final GateAccessController gateAccessController;
     private final ParkingSpotController parkingSpotController;
-    private final Parking parking;
+    private final ParkingService parking;
 
     private ClientManager mqttClientManager;
 
-    public CallbackHandler(GateAccessController gateAccessController, ParkingSpotController parkingSpotController, Parking parking) {
+    public CallbackHandler(GateAccessController gateAccessController, ParkingSpotController parkingSpotController, ParkingService parking) {
         this.gateAccessController = gateAccessController;
         this.parkingSpotController = parkingSpotController;
         this.parking = parking;
@@ -46,22 +46,23 @@ public class CallbackHandler implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         mqttClientManager.handleReceivedMessage(topic, message);
 
-
-        if (topic.equals("backend/parking/gate/validation/rfid")) {
-            String cardCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-            if (gateAccessController.getGateAccessByRfidCode(cardCode) != null) {
-                parking.setEntryGateOpened(true);
-                parking.setIdentificationCode(cardCode);
-                mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
+        switch (topic) {
+            case "backend/parking/gate/validation/rfid" -> {
+                String cardCode = new String(message.getPayload(), StandardCharsets.UTF_8);
+                if (gateAccessController.getGateAccessByRfidCode(cardCode) != null) {
+                    parking.setIdentificationCode(cardCode);
+                    parking.setEntryGateOpened(true);
+                    mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
+                }
             }
-        }
 
-        if (topic.equals("backend/parking/gate/validation/qrCode")) {
-            String qrCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-            if (gateAccessController.getGateAccessByQrCode(qrCode) != null && !parking.isEntryGateOpened()) {
-                parking.setEntryGateOpened(true);
-                parking.setIdentificationCode(qrCode);
-                mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
+            case "backend/parking/gate/validation/qrCode" -> {
+                String qrCode = new String(message.getPayload(), StandardCharsets.UTF_8);
+                if (gateAccessController.getGateAccessByQrCode(qrCode) != null && !parking.isEntryGateOpened()) {
+                    parking.setEntryGateOpened(true);
+                    parking.setIdentificationCode(qrCode);
+                    mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
+                }
             }
 
             case "backend/parking/spot/A1/distance" -> {
