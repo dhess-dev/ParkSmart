@@ -1,23 +1,22 @@
-package com.example.backend;
+package com.example.backend.services;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.example.backend.models.DailyParkingCount;
+import com.example.backend.models.ParkingCount;
 import com.example.backend.models.ParkingEvent;
 import com.example.backend.models.ParkingStatus;
-import com.example.backend.repositories.DailyParkingCountRepository;
+import com.example.backend.repositories.ParkingCountRepository;
 import com.example.backend.repositories.ParkingEventRepository;
 import com.example.backend.repositories.ParkingStatusRepository;
 
 @Service
 @EnableScheduling
-public class Parking {
+public class ParkingService {
 
     private String identificationCode;
     private boolean spotOccupied;
@@ -25,53 +24,56 @@ public class Parking {
     private boolean exitGateOpened;
 
     private final ParkingEventRepository parkingEventRepository;
-    private final DailyParkingCountRepository dailyParkingCountRepository;
+    private final ParkingCountRepository parkingCountRepository;
+    private final ParkingStatusRepository parkingStatusRepository;
 
-    @Autowired
-    private ParkingStatusRepository parkingStatusRepository;
-
-    public Parking(ParkingEventRepository parkingEventRepository, DailyParkingCountRepository dailyParkingCountRepository) {
+    public ParkingService(ParkingEventRepository parkingEventRepository, ParkingCountRepository parkingCountRepository, ParkingStatusRepository parkingStatusRepository) {
         this.parkingEventRepository = parkingEventRepository;
-        this.dailyParkingCountRepository = dailyParkingCountRepository;
-    }
-
-    public long calculateFreeParkingSpots() {
-        long entryCount = parkingEventRepository.countByEvent("entry");
-        long exitCount = parkingEventRepository.countByEvent("exit");
-        long capacity = entryCount - exitCount;
-        return Math.max(10 - capacity, 0);
-    }
-
-    public long calculateTotalCars() {
-        long totalCarsPerDay = parkingEventRepository.countByEvent("entry");
-        return totalCarsPerDay;
+        this.parkingCountRepository = parkingCountRepository;
+        this.parkingStatusRepository = parkingStatusRepository;
     }
 
     @Scheduled(cron = "0 0 0 * * *")
     public void dailyScheduler() {
+        LocalDate date = LocalDate.now();
+        ParkingCount parkingCount = new ParkingCount();
+        parkingCount.setCarsInParking(0);
+        parkingCount.setDate(date);
+        parkingCountRepository.save(parkingCount);
         parkingEventRepository.deleteAll();
     }
 
-    public void updateParkingCountEntry() {
-        long totalCarsPerDay = calculateTotalCars();
-        LocalDate date = LocalDate.now();  
-
-        if (dailyParkingCountRepository.findByDate(date).isEmpty()) {
-            DailyParkingCount dailyParkingCount = new DailyParkingCount();
-            dailyParkingCount.setCarsInParking(totalCarsPerDay);
-            dailyParkingCount.setDate(date);  
-            dailyParkingCountRepository.save(dailyParkingCount); 
+    public void updateParkingCount() {
+        LocalDate date = LocalDate.now();
+        ParkingCount parkingCount = parkingCountRepository.findByDate(date).orElse(new ParkingCount());
+        if (parkingCount.getId() == null) {
+            parkingCount.setCarsInParking(1);
+            parkingCount.setDate(date);
+            parkingCountRepository.save(parkingCount);
         } else {
-            dailyParkingCountRepository.updateCarCountByDate(date, totalCarsPerDay);
+            long currentCarsInParking = parkingCount.getCarsInParking();
+            long newCarsInParking = currentCarsInParking + 1;
+            parkingCountRepository.updateCarCountByDate(date, newCarsInParking);
         }
     }
 
-    public void createParkingStatusEntry() {
-        long freeParkingSpots = calculateFreeParkingSpots();
+    public void createParkingStatusEntry(String eventType) {
+        int freeParkingSpots = parkingStatusRepository.getLatestParkingSpots();
+        int summand = switch (eventType) {
+            case "exit" ->
+                1;
+            case "entry" ->
+                -1;
+            default ->
+                0;
+        };
+
+        int newFreeParkingSpots = freeParkingSpots + summand;
+
         ParkingStatus status = new ParkingStatus();
-        OffsetDateTime timestamp = OffsetDateTime.now();
-        status.setFreeSpots(freeParkingSpots) ;
-        status.setTimestamp(timestamp);
+        status.setFreeSpots(newFreeParkingSpots);
+        status.setTimestamp(OffsetDateTime.now());
+
         parkingStatusRepository.save(status);
     }
 

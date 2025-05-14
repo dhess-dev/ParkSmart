@@ -14,13 +14,13 @@ import jakarta.persistence.Table;
 public class ParkingStatus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  
-    private Long id; 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, updatable = false)
     private OffsetDateTime timestamp;
 
-    private long freeSpots;
+    private int freeSpots;
 
     public long getId() {
         return id;
@@ -38,11 +38,11 @@ public class ParkingStatus {
         this.timestamp = timestamp;
     }
 
-    public long getFreeSpots() {
+    public int getFreeSpots() {
         return freeSpots;
     }
 
-    public void setFreeSpots(long freeSpots) {
+    public void setFreeSpots(int freeSpots) {
         this.freeSpots = freeSpots;
     }
 }

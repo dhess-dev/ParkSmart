@@ -1,23 +1,27 @@
 package com.example.backend.config;
 
-import com.example.backend.models.GateAccess;
-import com.example.backend.models.ParkingSpot;
-import com.example.backend.models.User;
-import com.example.backend.repositories.GateAccessRepository;
-import com.example.backend.repositories.ParkingSpotRepository;
-import com.example.backend.repositories.UserRepository;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-import java.util.Set;
+import com.example.backend.models.GateAccess;
+import com.example.backend.models.ParkingSpot;
+import com.example.backend.models.ParkingStatus;
+import com.example.backend.models.User;
+import com.example.backend.repositories.GateAccessRepository;
+import com.example.backend.repositories.ParkingSpotRepository;
+import com.example.backend.repositories.ParkingStatusRepository;
+import com.example.backend.repositories.UserRepository;
 
 @Configuration
 public class InitialAdminConfig {
 
     @Bean
-    CommandLineRunner createAdmin(UserRepository userRepository, ParkingSpotRepository parkingSpotRepository, GateAccessRepository gateAccessRepository) {
+    CommandLineRunner createAdmin(UserRepository userRepository, ParkingSpotRepository parkingSpotRepository, GateAccessRepository gateAccessRepository, ParkingStatusRepository parkingStatusRepository) {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()) {
                 User admin = new User();
@@ -58,8 +62,8 @@ public class InitialAdminConfig {
                 }
                 System.out.println("Seeded " + positions.size() + " parking spots (only A1 is free).");
             } else {
-                System.out.println("Parking spots already exist: count=" +
-                        parkingSpotRepository.count());
+                System.out.println("Parking spots already exist: count="
+                        + parkingSpotRepository.count());
             }
 
             if (gateAccessRepository.count() == 0) {
@@ -68,7 +72,13 @@ public class InitialAdminConfig {
                 access.setRfidCode("256DA883");
                 gateAccessRepository.save(access);
             }
+
+            if (parkingStatusRepository.count() == 0) {
+                OffsetDateTime timestamp = OffsetDateTime.now();
+                ParkingStatus status = new ParkingStatus();
+                status.setFreeSpots(10);
+                status.setTimestamp(timestamp);
+            }
         };
     }
 }
-

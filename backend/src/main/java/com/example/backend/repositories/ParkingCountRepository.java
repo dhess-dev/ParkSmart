@@ -9,17 +9,18 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.example.backend.models.DailyParkingCount;
+import com.example.backend.models.ParkingCount;
 
 import jakarta.transaction.Transactional;
 
-public interface DailyParkingCountRepository extends JpaRepository<DailyParkingCount, Long> {
-    List<DailyParkingCount> findAllByOrderByDateAsc();
+public interface ParkingCountRepository extends JpaRepository<ParkingCount, Long> {
 
-    Optional<DailyParkingCount> findByDate(LocalDate date);
+    List<ParkingCount> findAllByOrderByDateAsc();
+
+    Optional<ParkingCount> findByDate(LocalDate date);
 
     @Modifying
     @Transactional
-    @Query("UPDATE DailyParkingCount d SET d.carsInParking = :newCarsInParking WHERE d.date = :date")
+    @Query("UPDATE ParkingCount p SET p.carsInParking = :newCarsInParking WHERE p.date = :date")
     void updateCarCountByDate(@Param("date") LocalDate date, @Param("newCarsInParking") long newCarsInParking);
 }
