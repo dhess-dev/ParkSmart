@@ -1,14 +1,24 @@
-name: Build and Push to GitHub Container Registry
+name: Build, Test, and Push to GitHub Container Registry
 
 on:
   push:
-    branches: ["main"]
+    branches: ["82-tests-in-git-runner-ausführen"]
   pull_request:
-    branches: ["main"]
+    branches: ["82-tests-in-git-runner-ausführen"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: groupone_db
 
     steps:
       - name: Checkout code
@@ -19,6 +29,34 @@ jobs:
         with:
           java-version: "21"
           distribution: "temurin"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for i in {1..10}; do
+            if pg_isready -h localhost -p 5432; then
+              echo "PostgreSQL is ready";
+              break;
+            fi;
+            echo "Waiting for PostgreSQL...";
+            sleep 5;
+          done
+
+      - name: Run backend tests
+        working-directory: backend
+        run: ./gradlew test
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Run frontend tests
+        working-directory: frontend
+        run: npm test -- --watchAll=false
 
       - name: Build backend JAR
         working-directory: backend
