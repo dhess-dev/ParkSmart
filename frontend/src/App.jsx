@@ -13,7 +13,6 @@ import Login from "./pages/Login";
 import Bookings from "./pages/Bookings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
-import Plans from "./pages/Plans";
 
 export default function App() {
   const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
@@ -50,50 +49,47 @@ export default function App() {
 
   if (loading) return <p>Loading…</p>;
 
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Layout
-                user={user}
-                onLogout={() => {
-                  // call your logout endpoint to clear the session cookie,
-                  // then clear local user state:
-                  fetch(`${apiUrl}/api/users/logout`, {
-                    method: "POST",
-                    credentials: "include",
-                  }).finally(() => setUser(null));
-                }}
-                mode={mode}
-                setMode={setMode}
-              />
-            }
-          >
-            {/* Public */}
-            <Route index element={<Home />} />
-            <Route path="about" element={<About />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route
-              path="login"
-              element={
-                <Login
-                  onLogin={() => {
-                    // after successful login, re-fetch /me:
-                    fetch(`${apiUrl}/api/users/me`, { credentials: "include" })
-                      .then((r) => {
-                        if (!r.ok) throw new Error("Failed to fetch user data");
-                        return r.json();
-                      })
-                      .then(setUser)
-                      .catch(() => setUser(null));
-                  }}
-                />
-              }
-            />
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <BrowserRouter>
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            <Layout
+                                user={user}
+                                onLogout={() => {
+                                    // call your logout endpoint to clear the session cookie,
+                                    // then clear local user state:
+                                    fetch(`${apiUrl}/api/users/logout`, {
+                                        method: "POST",
+                                        credentials: "include",
+                                    }).finally(() => setUser(null));
+                                }}
+                                mode={mode}
+                                setMode={setMode}
+                            />
+                        }
+                    >
+                        {/* Public */}
+                        <Route index element={<Home/>}/>
+                        <Route path="about" element={<About/>}/>
+                        <Route path="dashboard" element={<Dashboard/>}/>
+                        <Route path="register" element={<Register/>}/>
+                        <Route
+                            path="login"
+                            element={<Login onLogin={() => {
+                                // after successful login, re-fetch /me:
+                                fetch(`${apiUrl}/api/users/me`, {credentials: "include"})
+                                    .then(r => {
+                                        if (!r.ok) throw new Error("Failed to fetch user data");
+                                        return r.json();
+                                    })
+                                    .then(setUser)
+                                    .catch(() => setUser(null));
+                            }}/>}
+                        />
 
             {/* Authenticated */}
             <Route
