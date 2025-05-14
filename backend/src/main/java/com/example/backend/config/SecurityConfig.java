@@ -17,30 +17,36 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                http
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .csrf(AbstractHttpConfigurer::disable)
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/api/users/login",
-                                                                "/api/dashboard",
-                                                                "/api/users",
-                                                                "/api/users/me",
-                                                                "/api/plans")
-                                                .permitAll()
-                                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                                .anyRequest().authenticated())
-                                .httpBasic(AbstractHttpConfigurer::disable)
-                                .formLogin(form -> form
-                                                .loginProcessingUrl("/api/users/login")
-                                                .successHandler((req, res, auth) -> res.setStatus(200))
-                                                .failureHandler((req, res, ex) -> res.sendError(401)))
-                                .logout(logout -> logout
-                                                .logoutUrl("/api/users/logout")
-                                                .invalidateHttpSession(true)
-                                                .deleteCookies("JSESSIONID") // kill the JSESSIONID cookie
-                                                .logoutSuccessHandler((req, res, auth) -> res.setStatus(200)));
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/users/login",
+                                "/api/dashboard",
+                                "/api/users",
+                                "/api/users/me",
+                                "/api/plans",
+                                "/api/parkingSpot"
+                        ).permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(form -> form
+                        .loginProcessingUrl("/api/users/login")
+                        .successHandler((req, res, auth) -> res.setStatus(200))
+                        .failureHandler((req, res, ex) -> res.sendError(401)))
+                .logout(logout -> logout
+                        .logoutUrl("/api/users/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")        // kill the JSESSIONID cookie
+                        .logoutSuccessHandler((req, res, auth) -> res.setStatus(200))
+                );
+
 
                 return http.build();
         }
