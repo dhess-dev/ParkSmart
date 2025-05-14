@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "set NODE_TLS_REJECT_UNAUTHORIZED=0 && vitest"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
