@@ -38,6 +38,7 @@ export default function Layout({ user, onLogout, mode, setMode }) {
           { label: "About", to: "/about" },
           { label: "Dashboard", to: "/dashboard" },
           { label: "My Bookings", to: "/bookings" },
+          { label: "Book Plans", to: "/plans" },
           ...(user
             ? [
                 { label: "Profile", to: "/profile" },

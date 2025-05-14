@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Bookings from "./pages/Bookings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import Plans from "./pages/Plans";
 
 export default function App() {
   const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
@@ -100,6 +101,14 @@ export default function App() {
               element={
                 <ProtectedRoute user={user}>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="plans"
+              element={
+                <ProtectedRoute user={user}>
+                  <Plans />
                 </ProtectedRoute>
               }
             />

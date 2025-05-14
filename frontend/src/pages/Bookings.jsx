@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 
 const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
 
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedQrCode, setSelectedQrCode] = useState("");
 
   useEffect(() => {
     fetch(`${apiUrl}/api/bookings`, {
@@ -14,6 +17,16 @@ export default function Bookings() {
       .then(setBookings)
       .catch((err) => console.error("Failed to fetch bookings:", err));
   }, []);
+
+  const handleQrCodeClick = (qrCodeUrl) => {
+    setSelectedQrCode(qrCodeUrl);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedQrCode("");
+  };
 
   return (
     <div>
@@ -34,11 +47,28 @@ export default function Bookings() {
             <img
               src={`${apiUrl}/api/bookings/qrcode/${booking.qrCodeContent}`}
               alt="QR Code"
-              style={{ width: "150px", height: "150px" }}
+              style={{ width: "150px", height: "150px", cursor: "pointer" }}
+              onClick={() =>
+                handleQrCodeClick(
+                  `${apiUrl}/api/bookings/qrcode/${booking.qrCodeContent}`
+                )
+              }
             />
           </li>
         ))}
       </ul>
+
+    
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle>QR Code</DialogTitle>
+        <DialogContent style={{ textAlign: "center" }}>
+          <img
+            src={selectedQrCode}
+            alt="QR Code"
+            style={{ width: "100%", maxWidth: "400px", height: "auto" }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

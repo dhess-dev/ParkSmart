@@ -22,30 +22,7 @@ export default function Dashboard() {
     }
   }, [count]);
 
-  const createBooking = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/api/bookings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // Include cookies for authentication
-        body: JSON.stringify({
-          type: "time-limited", // Example type
-          startTime: new Date().toISOString(),
-          endTime: new Date(Date.now() + 3600000).toISOString(), // 1 hour later
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setMessage(`Booking created! QR Code: ${data.qrCodeContent}`);
-      } else {
-        setMessage("Failed to create booking.");
-      }
-    } catch (error) {
-      console.error("Error creating booking:", error);
-      setMessage("An error occurred.");
-    }
-  };
+  
 
   return (
     <>
@@ -86,11 +63,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div>
-        <h2>Dashboard</h2>
-        <button onClick={createBooking}>Create Booking</button>
-        {message && <p>{message}</p>}
-      </div>
+      
     </>
   );
 }

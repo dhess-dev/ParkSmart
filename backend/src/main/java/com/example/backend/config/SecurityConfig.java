@@ -26,7 +26,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/users/login",
                                                                 "/api/dashboard",
                                                                 "/api/users",
-                                                                "/api/users/me")
+                                                                "/api/users/me",
+                                                                "/api/plans")
                                                 .permitAll()
                                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())

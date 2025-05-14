@@ -35,12 +35,14 @@ public class BookingService {
         booking.setType(type);
         booking.setStartTime(startTime);
         booking.setEndTime(endTime);
-
-        // Generate QR code content
+      
         String qrCodeContent = UUID.randomUUID().toString();
         booking.setQrCodeContent(qrCodeContent);
 
-        // Save booking to the database
+        return bookingRepository.save(booking);
+    }
+
+    public Booking createBooking(Booking booking) {
         return bookingRepository.save(booking);
     }
 
