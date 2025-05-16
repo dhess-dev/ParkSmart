@@ -37,6 +37,7 @@ public class ParkingService {
     private final ParkingCountRepository parkingCountRepository;
     private final ParkingStatusRepository parkingStatusRepository;
     private final ParkingSpotController parkingSpotController;
+    private final int PARKING_SPOT_OCCUPIED_DISTANCE = 5;
 
     public ParkingService(
             ParkingEventRepository parkingEventRepository,
@@ -84,7 +85,7 @@ public class ParkingService {
             throw new IllegalArgumentException("Invalid distance payload: " + payload);
         }
 
-        boolean isOccupied = distance <= 5;
+        boolean isOccupied = distance <= PARKING_SPOT_OCCUPIED_DISTANCE;
         boolean currentStatus;
 
         switch (spotId) {

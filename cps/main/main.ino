@@ -270,7 +270,7 @@ void loop() {
   Serial.print("DistanceGate (cm SECOND): ");
   Serial.println(distanceGate);
 
-  Serial.print("DistanceGate (cm A2): ");
+  Serial.print("DistanceA2 (cm): ");
   Serial.println(distanceA2);
 
   String payloadA1 = String(distanceA1, 2);
