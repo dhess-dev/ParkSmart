@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.example.backend.controller.GateAccessController;
-import com.example.backend.controller.ParkingSpotController;
 import com.example.backend.services.ParkingService;
 
 @Component
@@ -21,15 +20,13 @@ public class CallbackHandler implements MqttCallback {
     private static final Logger logger = LoggerFactory.getLogger(CallbackHandler.class);
 
     private final GateAccessController gateAccessController;
-    private final ParkingSpotController parkingSpotController;
-    private final ParkingService parking;
+    private final ParkingService parkingService;
 
     private ClientManager mqttClientManager;
 
-    public CallbackHandler(GateAccessController gateAccessController, ParkingSpotController parkingSpotController, ParkingService parking) {
+    public CallbackHandler(GateAccessController gateAccessController, ParkingService parkingService) {
         this.gateAccessController = gateAccessController;
-        this.parkingSpotController = parkingSpotController;
-        this.parking = parking;
+        this.parkingService = parkingService;
     }
 
     @Autowired
@@ -50,57 +47,54 @@ public class CallbackHandler implements MqttCallback {
             case "backend/parking/gate/validation/rfid" -> {
                 String cardCode = new String(message.getPayload(), StandardCharsets.UTF_8);
                 if (gateAccessController.getGateAccessByRfidCode(cardCode) != null) {
-                    parking.setIdentificationCode(cardCode);
-                    parking.setEntryGateOpened(true);
+                    parkingService.setIdentificationCode(cardCode);
+                    parkingService.setEntryGateOpened(true);
                     mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
                 }
             }
 
             case "backend/parking/gate/validation/qrCode" -> {
                 String qrCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-                if (gateAccessController.getGateAccessByQrCode(qrCode) != null && !parking.isEntryGateOpened()) {
-                    parking.setEntryGateOpened(true);
-                    parking.setIdentificationCode(qrCode);
+                if (gateAccessController.getGateAccessByQrCode(qrCode) != null && !parkingService.isEntryGateOpened()) {
+                    parkingService.setEntryGateOpened(true);
+                    parkingService.setIdentificationCode(qrCode);
                     mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
                 }
             }
 
-            case "backend/parking/spot/A1/distance" -> {
-                String payload = new String(message.getPayload());
-                float distance = Float.parseFloat(payload);
-                if ((distance <= 5) != parking.isSpotOccupied()) {
-                    parking.setSpotOccupied(distance <= 5);
-                    parkingSpotController.updateSpot("A1");
-                    mqttClientManager.publishMessage("cps/parking/spot/A1/isOccupied", parking.isSpotOccupied() ? "1" : "0");
-                }
+            case "backend/parking/distance/spot/A1" -> {
+                parkingService.handleSpotDistanceUpdate("A1", message);
             }
 
-            case "backend/parking/gate/distance" -> {
-                String payload = new String(message.getPayload());
-                float distance = Float.parseFloat(payload);
+            case "backend/parking/distance/spot/A2" -> {
+                parkingService.handleSpotDistanceUpdate("A2", message);
+            }
 
-                if ((distance <= 5) && parking.isEntryGateOpened()) {
+            case "backend/parking/distance/gate" -> {
+                String payload = new String(message.getPayload());
+                float distance = Float.parseFloat(payload);           
+                if ((distance <= 5) && parkingService.isEntryGateOpened()) {
                     String eventType = "entry";
                     mqttClientManager.publishMessage("cps/parking/gate/entry/open", "0");
-                    parking.setEntryGateOpened(false);
-                    parking.logParkingEvent(eventType);
-                    parking.createParkingStatusEntry(eventType);
-                    parking.updateParkingCount();
+                    parkingService.setEntryGateOpened(false);
+                    parkingService.logParkingEvent(eventType);
+                    parkingService.createParkingStatusEntry(eventType);
+                    parkingService.updateParkingCount();
                 }
 
                 boolean isCarInRange = distance > 5 && distance <= 10;
-                if (isCarInRange && !parking.isExitGateOpened()) {
+                if (isCarInRange && !parkingService.isExitGateOpened()) {
                     String eventType = "exit";
                     mqttClientManager.publishMessage("cps/parking/gate/exit/open", "1");
-                    parking.setExitGateOpened(true);
-                    parking.logParkingEvent(eventType);
-                    parking.createParkingStatusEntry(eventType);
+                    parkingService.setExitGateOpened(true);
+                    parkingService.logParkingEvent(eventType);
+                    parkingService.createParkingStatusEntry(eventType);
                 }
             }
 
             case "backend/parking/gate/exit/open" -> {
                 String payload = new String(message.getPayload());
-                parking.setExitGateOpened(payload.equals("1"));
+                parkingService.setExitGateOpened(payload.equals("1"));
             }
         }
     }
