@@ -39,18 +39,7 @@ public class ParkingService {
     private final ParkingSpotController parkingSpotController;
     private final int PARKING_SPOT_OCCUPIED_DISTANCE = 5;
 
-    public ParkingService(
-            ParkingEventRepository parkingEventRepository,
-            ParkingCountRepository parkingCountRepository,
-            ParkingStatusRepository parkingStatusRepository,
-            ParkingSpotController parkingSpotController) {
-
-    @Autowired
-    @Lazy
-    private ClientManager mqttClientManager;
-
-
-    public ParkingService(ParkingEventRepository parkingEventRepository, ParkingCountRepository parkingCountRepository, ParkingStatusRepository parkingStatusRepository) {
+    public ParkingService(ParkingEventRepository parkingEventRepository, ParkingCountRepository parkingCountRepository, ParkingStatusRepository parkingStatusRepository, ParkingSpotController parkingSpotController) {
         this.parkingEventRepository = parkingEventRepository;
         this.parkingCountRepository = parkingCountRepository;
         this.parkingStatusRepository = parkingStatusRepository;
