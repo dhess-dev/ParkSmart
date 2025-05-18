@@ -45,6 +45,12 @@ public class ParkingService {
             ParkingStatusRepository parkingStatusRepository,
             ParkingSpotController parkingSpotController) {
 
+    @Autowired
+    @Lazy
+    private ClientManager mqttClientManager;
+
+
+    public ParkingService(ParkingEventRepository parkingEventRepository, ParkingCountRepository parkingCountRepository, ParkingStatusRepository parkingStatusRepository) {
         this.parkingEventRepository = parkingEventRepository;
         this.parkingCountRepository = parkingCountRepository;
         this.parkingStatusRepository = parkingStatusRepository;
@@ -119,7 +125,9 @@ public class ParkingService {
         ParkingStatus status = new ParkingStatus();
         status.setFreeSpots(newFreeParkingSpots);
         status.setTimestamp(OffsetDateTime.now());
-
+        
+        mqttClientManager.publishMessage("cps/parking/spots/count", String.valueOf(newFreeParkingSpots));
+        
         parkingStatusRepository.save(status);
     }
 
