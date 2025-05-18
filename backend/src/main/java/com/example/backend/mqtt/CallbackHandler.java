@@ -70,10 +70,9 @@ public class CallbackHandler implements MqttCallback {
                 parkingService.handleSpotDistanceUpdate("A2", message);
             }
 
-            case "backend/parking/gate/distance" -> {
+            case "backend/parking/distance/gate" -> {
                 String payload = new String(message.getPayload());
-                float distance = Float.parseFloat(payload);
-
+                float distance = Float.parseFloat(payload);           
                 if ((distance <= 5) && parkingService.isEntryGateOpened()) {
                     String eventType = "entry";
                     mqttClientManager.publishMessage("cps/parking/gate/entry/open", "0");
