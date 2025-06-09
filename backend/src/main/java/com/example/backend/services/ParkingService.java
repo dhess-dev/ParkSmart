@@ -10,7 +10,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.example.backend.controller.ParkingCountController;
 import com.example.backend.controller.ParkingSpotController;
+import com.example.backend.controller.ParkingStatusController;
 import com.example.backend.models.ParkingCount;
 import com.example.backend.models.ParkingEvent;
 import com.example.backend.models.ParkingStatus;
@@ -37,13 +39,17 @@ public class ParkingService {
     private final ParkingCountRepository parkingCountRepository;
     private final ParkingStatusRepository parkingStatusRepository;
     private final ParkingSpotController parkingSpotController;
+    private final ParkingCountController parkingCountController;
+    private final ParkingStatusController parkingStatusController;
     private final int PARKING_SPOT_OCCUPIED_DISTANCE = 5;
 
-    public ParkingService(ParkingEventRepository parkingEventRepository, ParkingCountRepository parkingCountRepository, ParkingStatusRepository parkingStatusRepository, ParkingSpotController parkingSpotController) {
+    public ParkingService(ParkingEventRepository parkingEventRepository, ParkingCountRepository parkingCountRepository, ParkingStatusRepository parkingStatusRepository, ParkingSpotController parkingSpotController, ParkingCountController parkingCountController, ParkingStatusController parkingStatusController) {
         this.parkingEventRepository = parkingEventRepository;
         this.parkingCountRepository = parkingCountRepository;
         this.parkingStatusRepository = parkingStatusRepository;
         this.parkingSpotController = parkingSpotController;
+        this.parkingCountController = parkingCountController;
+        this.parkingStatusController = parkingStatusController;
     }
 
     @Scheduled(cron = "0 0 0 * * *") 
@@ -63,11 +69,12 @@ public class ParkingService {
             parkingCount = new ParkingCount();
             parkingCount.setCarsInParking(1);
             parkingCount.setDate(date);
-            parkingCountRepository.save(parkingCount);
+            parkingCountRepository.save(parkingCount);    
         } else {
             long newCarsInParking = parkingCount.getCarsInParking() + 1;
             parkingCountRepository.updateCarCountByDate(date, newCarsInParking);
         }
+        parkingCountController.updateParkingCount();
     }
 
     public void handleSpotDistanceUpdate(String spotId, MqttMessage message) {
@@ -118,6 +125,7 @@ public class ParkingService {
         mqttClientManager.publishMessage("cps/parking/spots/count", String.valueOf(newFreeParkingSpots));
         
         parkingStatusRepository.save(status);
+        parkingStatusController.updateParkingStatus();
     }
 
     public void logParkingEvent(String eventType) {

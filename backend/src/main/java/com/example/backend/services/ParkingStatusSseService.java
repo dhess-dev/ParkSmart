@@ -1,15 +1,16 @@
 package com.example.backend.services;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.example.backend.models.ParkingSpot;
+import com.example.backend.models.ParkingStatus;
 
 @Service
-public class ParkingSpotSseService {
+public class ParkingStatusSseService {
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     public SseEmitter subscribe() {
@@ -20,14 +21,13 @@ public class ParkingSpotSseService {
         return emitter;
     }
 
-    public void broadcast(List<ParkingSpot> spots) {
+     public void broadcast(List<ParkingStatus> status) {
         for (SseEmitter emitter : emitters) {
             try {
-                emitter.send(spots);
-            } catch (Exception e) {
+                emitter.send(status);
+            } catch (IOException e) {
                 emitters.remove(emitter);
             }
         }
     }
-
 }
