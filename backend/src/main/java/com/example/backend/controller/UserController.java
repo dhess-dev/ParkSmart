@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -37,8 +38,8 @@ public class UserController {
 
         if (!user.getPassword().startsWith("$2a$")) {
             user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash the password
-            user.getRoles().add("USER");
         }
+        user.setRoles(Set.of("USER"));
         return userRepository.save(user);
     }
 
