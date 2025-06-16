@@ -6,8 +6,8 @@
 
 
 // WiFi configuration
-const char *ssid = "foo";
-const char *password = "baa";
+const char *ssid = "FES-SuS";
+const char *password = "SuS-WLAN!Key24";
 
 // MQTT configuration
 const char *mqtt_server = "gruppe1iot-dev.local";
@@ -125,7 +125,7 @@ void setup() {
   mqttClient.onMessage(onMqttMessage);
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCredentials(mqtt_user, mqtt_password);
-  mqttClient.setClientId("foobar");
+  mqttClient.setClientId("MqttClientAdminRFID");
 
   // Connect to WiFi
   connectToWifi();
