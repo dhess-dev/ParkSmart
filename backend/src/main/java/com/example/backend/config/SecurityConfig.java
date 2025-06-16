@@ -32,6 +32,7 @@ public class SecurityConfig {
                                 "/api/users/me",
                                 "/api/plans",
                                 "/api/parkingSpot",
+                                "/api/parkingSpot/stream",
                                 "/api/parkingStatus",
                                 "/api/parkingStatus/stream",
                                 "/api/parkingCount",

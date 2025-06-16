@@ -1,39 +1,47 @@
-import { useEffect, useState, useCallback } from "react";
-import { Box, Paper, Typography, useTheme } from "@mui/material";
+import {useEffect, useState, useCallback} from "react";
+import {Box, Paper, Typography, useTheme} from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import { grey, green } from "@mui/material/colors";
+import {grey, green} from "@mui/material/colors";
 
-function useParkingSpots(apiUrl, intervalMs = 1000) {
+function useParkingSpots(apiUrl) {
     const [spots, setSpots] = useState([]);
 
-    useEffect(() => {
-        let mounted = true;
+    fetch(`${apiUrl}/api/parkingSpot`)
+        .then((res) => {
+            if (!res.ok) throw new Error("Failed to fetch spots");
+            return res.json();
+        })
+        .then(setSpots)
+        .catch((err) => console.error("Initial fetch failed:", err));
 
-        const fetchSpots = () => {
-            fetch(`${apiUrl}/api/parkingSpot`)
-                .then((r) => {
-                    if (!r.ok) throw new Error(r.statusText);
-                    return r.json();
-                })
-                .then((data) => {
-                    if (mounted) setSpots(data);
-                })
-                .catch(console.error);
+    useEffect(() => {
+        const eventSource = new EventSource(`${apiUrl}/api/parkingSpot/stream`);
+
+        eventSource.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log("SSE data", data);
+                setSpots(data);
+            } catch (err) {
+                console.error("Invalid SSE data:", err);
+            }
         };
 
-        fetchSpots(); // initial load
-        const handle = setInterval(fetchSpots, intervalMs);
+        eventSource.onerror = (err) => {
+            console.error("SSE error", err);
+            eventSource.close();
+        };
 
         return () => {
-            mounted = false;
-            clearInterval(handle);
+            eventSource.close();
         };
-    }, [apiUrl, intervalMs]);
+    }, [apiUrl]);
 
     return spots;
 }
 
-function SpotCell({ occupied, borderRight, theme }) {
+
+function SpotCell({occupied, borderRight, theme}) {
     return (
         <Paper
             elevation={3}
@@ -48,14 +56,14 @@ function SpotCell({ occupied, borderRight, theme }) {
         >
             {occupied && (
                 <DirectionsCarIcon
-                    sx={{ fontSize: 40, color: theme.palette.common.white }}
+                    sx={{fontSize: 40, color: theme.palette.common.white}}
                 />
             )}
         </Paper>
     );
 }
 
-function SpotLabel({ label, borderRight }) {
+function SpotLabel({label, borderRight}) {
     return (
         <Typography
             sx={{
@@ -80,14 +88,14 @@ export default function Dashboard() {
             spots
                 .filter((s) => s.position.startsWith(letter))
                 .sort((a, b) =>
-                    a.position.localeCompare(b.position, undefined, { numeric: true })
+                    a.position.localeCompare(b.position, undefined, {numeric: true})
                 ),
         [spots]
     );
 
     const rows = [
-        { key: "A", spots: getRow("A") },
-        { key: "B", spots: getRow("B") },
+        {key: "A", spots: getRow("A")},
+        {key: "B", spots: getRow("B")},
     ];
 
     const makeBorder = (i, length) =>
@@ -103,10 +111,10 @@ export default function Dashboard() {
                 display="grid"
                 gridTemplateColumns={`repeat(${rows[0].spots.length}, 1fr)`}
                 gridAutoRows="auto"
-                sx={{ width: "100%", rowGap: 1 }}
+                sx={{width: "100%", rowGap: 1}}
             >
-                {rows.map(({ key, spots }, rowIndex) => (
-                    <Box key={key} sx={{ display: "contents" }}>
+                {rows.map(({key, spots}, rowIndex) => (
+                    <Box key={key} sx={{display: "contents"}}>
                         {spots.map((spot, i) => (
                             <SpotCell
                                 key={spot.id}
