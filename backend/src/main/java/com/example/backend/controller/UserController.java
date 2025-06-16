@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -37,8 +38,8 @@ public class UserController {
 
         if (!user.getPassword().startsWith("$2a$")) {
             user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash the password
-            user.getRoles().add("USER");
         }
+        user.setRoles(Set.of("USER"));
         return userRepository.save(user);
     }
 
@@ -56,5 +57,48 @@ public class UserController {
         return userService.updateProfile(authentication, incoming);
     }
 
+    /**
+     * DELETE /api/users/{id}
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * GET /api/users/{id}
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * PUT /api/users/{id}
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(
+            @PathVariable Long id,
+            @RequestBody User incoming
+    ) {
+        return userRepository.findById(id).map(existing -> {
+            existing.setFirstName(incoming.getFirstName());
+            existing.setLastName(incoming.getLastName());
+            existing.setPhoneNumber(incoming.getPhoneNumber());
+            existing.setAddress(incoming.getAddress());
+            existing.setCity(incoming.getCity());
+            existing.setCountry(incoming.getCountry());
+            existing.setPostalCode(incoming.getPostalCode());
+
+            User saved = userRepository.save(existing);
+            return ResponseEntity.ok(saved);
+        }).orElse(ResponseEntity.notFound().build());
+    }
 
 }

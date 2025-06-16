@@ -30,11 +30,11 @@ export default function Register() {
 
         {name: "firstName", label: "First Name", required: true, xs: 6},
         {name: "lastName", label: "Last Name", required: true, xs: 6},
-        {name: "phoneNumber", label: "Phone Number", required: false, xs: 6},
-        {name: "address", label: "Address", required: false, xs: 6},
-        {name: "city", label: "City", required: false, xs: 4},
-        {name: "postalCode", label: "Postal Code", required: false, xs: 4},
-        {name: "country", label: "Country", required: false, xs: 4},
+        {name: "phoneNumber", label: "Phone Number", required: true, xs: 6},
+        {name: "address", label: "Address", required: true, xs: 6},
+        {name: "city", label: "City", required: true, xs: 4},
+        {name: "postalCode", label: "Postal Code", required: true, xs: 4},
+        {name: "country", label: "Country", required: true, xs: 4},
     ];
 
     const handleSubmit = async (values) => {

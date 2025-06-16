@@ -3,6 +3,7 @@ package com.example.backend.mqtt;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import com.example.backend.services.ParkingSpotSseService;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -34,16 +35,18 @@ public class ClientManager {
     private final String clientId;
     private IMqttClient mqttClient;
     private final CallbackHandler callbackHandler;
+    private final ParkingSpotSseService sseService;
 
     public ClientManager(
             @Value("${MQTT_BROKER_URL:tcp://gruppe1iot.local:1883}") String mqttBrokerUrl,
             @Value("${MQTT_USERNAME:gruppe1}") String mqttUsername,
             @Value("${MQTT_PASSWORD:gruppe1}") String mqttPassword,
-            CallbackHandler callbackHandler
+            CallbackHandler callbackHandler, ParkingSpotSseService sseService
     ) {
         this.brokerUrl = mqttBrokerUrl;
         this.username = mqttUsername;
         this.password = mqttPassword;
+        this.sseService = sseService;
         this.clientId = "client_" + UUID.randomUUID().toString();
         this.callbackHandler = callbackHandler;
         logger.info("Using MQTT broker at: {}", this.brokerUrl);
@@ -116,5 +119,8 @@ public class ClientManager {
     public void handleReceivedMessage(String topic, MqttMessage message) {
         String msgContent = new String(message.getPayload(), StandardCharsets.UTF_8);
         logger.info("Message received on topic '{}': {}", topic, msgContent);
+        if ("backend/admin/rfid".equals(topic)) {
+            sseService.broadcastRfid(msgContent);
+        }
     }
 }
