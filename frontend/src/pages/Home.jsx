@@ -1,39 +1,54 @@
-import { useEffect, useState, useCallback } from "react";
-import { Box, Paper, Typography, useTheme } from "@mui/material";
+import {useEffect, useState, useCallback} from "react";
+import {Box, Paper, Typography, useTheme} from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import { grey, green } from "@mui/material/colors";
+import {grey, green} from "@mui/material/colors";
 
-function useParkingSpots(apiUrl, intervalMs = 1000) {
+function useParkingSpots(apiUrl) {
     const [spots, setSpots] = useState([]);
 
+    // first fetch
     useEffect(() => {
-        let mounted = true;
+        let cancelled = false;
 
-        const fetchSpots = () => {
-            fetch(`${apiUrl}/api/parkingSpot`)
-                .then((r) => {
-                    if (!r.ok) throw new Error(r.statusText);
-                    return r.json();
-                })
-                .then((data) => {
-                    if (mounted) setSpots(data);
-                })
-                .catch(console.error);
+        const load = async () => {
+            try {
+                const res = await fetch(`${apiUrl}/api/parkingSpot`);
+                if (!res.ok) throw new Error("Failed to fetch spots");
+                if (!cancelled) setSpots(await res.json());
+            } catch (err) {
+                if (!cancelled) console.error("Initial fetch failed:", err);
+            }
         };
 
-        fetchSpots(); // initial load
-        const handle = setInterval(fetchSpots, intervalMs);
+        load();
+        return () => (cancelled = true); // abort if the component unmounts
+    }, [apiUrl]);
 
-        return () => {
-            mounted = false;
-            clearInterval(handle);
+    // SSE subscription
+    useEffect(() => {
+        const es = new EventSource(`${apiUrl}/api/parkingSpot/stream`);
+
+        es.onmessage = (ev) => {
+            try {
+                setSpots(JSON.parse(ev.data));
+            } catch (err) {
+                console.error("Invalid SSE data:", err);
+            }
         };
-    }, [apiUrl, intervalMs]);
+        es.onerror = (err) => {
+            console.error("SSE error", err);
+            es.close();
+        };
+
+        return () => es.close();
+    }, [apiUrl]);
 
     return spots;
 }
 
-function SpotCell({ occupied, borderRight, theme }) {
+
+
+function SpotCell({occupied, borderRight, theme}) {
     return (
         <Paper
             elevation={3}
@@ -48,14 +63,14 @@ function SpotCell({ occupied, borderRight, theme }) {
         >
             {occupied && (
                 <DirectionsCarIcon
-                    sx={{ fontSize: 40, color: theme.palette.common.white }}
+                    sx={{fontSize: 40, color: theme.palette.common.white}}
                 />
             )}
         </Paper>
     );
 }
 
-function SpotLabel({ label, borderRight }) {
+function SpotLabel({label, borderRight}) {
     return (
         <Typography
             sx={{
@@ -80,14 +95,14 @@ export default function Dashboard() {
             spots
                 .filter((s) => s.position.startsWith(letter))
                 .sort((a, b) =>
-                    a.position.localeCompare(b.position, undefined, { numeric: true })
+                    a.position.localeCompare(b.position, undefined, {numeric: true})
                 ),
         [spots]
     );
 
     const rows = [
-        { key: "A", spots: getRow("A") },
-        { key: "B", spots: getRow("B") },
+        {key: "A", spots: getRow("A")},
+        {key: "B", spots: getRow("B")},
     ];
 
     const makeBorder = (i, length) =>
@@ -103,10 +118,10 @@ export default function Dashboard() {
                 display="grid"
                 gridTemplateColumns={`repeat(${rows[0].spots.length}, 1fr)`}
                 gridAutoRows="auto"
-                sx={{ width: "100%", rowGap: 1 }}
+                sx={{width: "100%", rowGap: 1}}
             >
-                {rows.map(({ key, spots }, rowIndex) => (
-                    <Box key={key} sx={{ display: "contents" }}>
+                {rows.map(({key, spots}, rowIndex) => (
+                    <Box key={key} sx={{display: "contents"}}>
                         {spots.map((spot, i) => (
                             <SpotCell
                                 key={spot.id}
