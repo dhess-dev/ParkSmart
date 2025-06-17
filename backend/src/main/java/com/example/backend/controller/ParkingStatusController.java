@@ -39,4 +39,7 @@ public class ParkingStatusController {
         sseService.broadcast(updatedParkingStatus);
     }
 
+    public ParkingStatus getLatest() {
+        return repository.findFirstByOrderByTimestampDesc();
+    }
 }

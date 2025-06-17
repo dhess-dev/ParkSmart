@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.example.backend.controller.GateAccessController;
+import com.example.backend.controller.ParkingStatusController;
 import com.example.backend.services.ParkingService;
 
 @Component
@@ -21,12 +22,14 @@ public class CallbackHandler implements MqttCallback {
 
     private final GateAccessController gateAccessController;
     private final ParkingService parkingService;
+    private final ParkingStatusController parkingStatusController;
 
     private ClientManager mqttClientManager;
 
-    public CallbackHandler(GateAccessController gateAccessController, ParkingService parkingService) {
+    public CallbackHandler(GateAccessController gateAccessController, ParkingService parkingService, ParkingStatusController parkingStatusController) {
         this.gateAccessController = gateAccessController;
         this.parkingService = parkingService;
+        this.parkingStatusController = parkingStatusController;
     }
 
     @Autowired
@@ -46,7 +49,7 @@ public class CallbackHandler implements MqttCallback {
         switch (topic) {
             case "backend/parking/gate/validation/rfid" -> {
                 String cardCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-                if (gateAccessController.getGateAccessByRfidCode(cardCode) != null) {
+                if (gateAccessController.getGateAccessByRfidCode(cardCode) != null && parkingStatusController.getLatest().getFreeSpots() > 0) {
                     parkingService.setIdentificationCode(cardCode);
                     parkingService.setEntryGateOpened(true);
                     mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
@@ -55,7 +58,7 @@ public class CallbackHandler implements MqttCallback {
 
             case "backend/parking/gate/validation/qrCode" -> {
                 String qrCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-                if (gateAccessController.getGateAccessByQrCode(qrCode) != null && !parkingService.isEntryGateOpened()) {
+                if (gateAccessController.getGateAccessByQrCode(qrCode) != null && !parkingService.isEntryGateOpened() && parkingStatusController.getLatest().getFreeSpots() > 0) {
                     parkingService.setEntryGateOpened(true);
                     parkingService.setIdentificationCode(qrCode);
                     mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
