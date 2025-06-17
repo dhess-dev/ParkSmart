@@ -6,39 +6,46 @@ import {grey, green} from "@mui/material/colors";
 function useParkingSpots(apiUrl) {
     const [spots, setSpots] = useState([]);
 
-    fetch(`${apiUrl}/api/parkingSpot`)
-        .then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch spots");
-            return res.json();
-        })
-        .then(setSpots)
-        .catch((err) => console.error("Initial fetch failed:", err));
-
+    // first fetch
     useEffect(() => {
-        const eventSource = new EventSource(`${apiUrl}/api/parkingSpot/stream`);
+        let cancelled = false;
 
-        eventSource.onmessage = (event) => {
+        const load = async () => {
             try {
-                const data = JSON.parse(event.data);
-                console.log("SSE data", data);
-                setSpots(data);
+                const res = await fetch(`${apiUrl}/api/parkingSpot`);
+                if (!res.ok) throw new Error("Failed to fetch spots");
+                if (!cancelled) setSpots(await res.json());
+            } catch (err) {
+                if (!cancelled) console.error("Initial fetch failed:", err);
+            }
+        };
+
+        load();
+        return () => (cancelled = true); // abort if the component unmounts
+    }, [apiUrl]);
+
+    // SSE subscription
+    useEffect(() => {
+        const es = new EventSource(`${apiUrl}/api/parkingSpot/stream`);
+
+        es.onmessage = (ev) => {
+            try {
+                setSpots(JSON.parse(ev.data));
             } catch (err) {
                 console.error("Invalid SSE data:", err);
             }
         };
-
-        eventSource.onerror = (err) => {
+        es.onerror = (err) => {
             console.error("SSE error", err);
-            eventSource.close();
+            es.close();
         };
 
-        return () => {
-            eventSource.close();
-        };
+        return () => es.close();
     }, [apiUrl]);
 
     return spots;
 }
+
 
 
 function SpotCell({occupied, borderRight, theme}) {
