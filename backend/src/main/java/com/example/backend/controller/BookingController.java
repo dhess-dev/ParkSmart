@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.models.Booking;
 import com.example.backend.models.User;
 import com.example.backend.services.BookingService;
+import com.example.backend.repositories.BookingRepository;
 import com.example.backend.repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,10 +17,12 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
 
-    public BookingController(BookingService bookingService, UserRepository userRepository) {
+    public BookingController(BookingService bookingService, UserRepository userRepository, BookingRepository bookingRepository) {
         this.bookingService = bookingService;
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     @PostMapping
@@ -59,6 +62,10 @@ public class BookingController {
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
+    }
+
+    public Booking getBookingByQrCode(String qrCode) {
+        return bookingRepository.findByQrCodeContent(qrCode).orElse(null);
     }
 
     public static class BookingRequest {

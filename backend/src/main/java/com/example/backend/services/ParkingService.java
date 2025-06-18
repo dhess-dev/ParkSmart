@@ -14,11 +14,9 @@ import com.example.backend.controller.ParkingCountController;
 import com.example.backend.controller.ParkingSpotController;
 import com.example.backend.controller.ParkingStatusController;
 import com.example.backend.models.ParkingCount;
-import com.example.backend.models.ParkingEvent;
 import com.example.backend.models.ParkingStatus;
 import com.example.backend.mqtt.ClientManager;
 import com.example.backend.repositories.ParkingCountRepository;
-import com.example.backend.repositories.ParkingEventRepository;
 import com.example.backend.repositories.ParkingStatusRepository;
 
 @Service
@@ -35,7 +33,6 @@ public class ParkingService {
     @Lazy
     private ClientManager mqttClientManager;
 
-    private final ParkingEventRepository parkingEventRepository;
     private final ParkingCountRepository parkingCountRepository;
     private final ParkingStatusRepository parkingStatusRepository;
     private final ParkingSpotController parkingSpotController;
@@ -43,8 +40,7 @@ public class ParkingService {
     private final ParkingStatusController parkingStatusController;
     private final int PARKING_SPOT_OCCUPIED_DISTANCE = 5;
 
-    public ParkingService(ParkingEventRepository parkingEventRepository, ParkingCountRepository parkingCountRepository, ParkingStatusRepository parkingStatusRepository, ParkingSpotController parkingSpotController, ParkingCountController parkingCountController, ParkingStatusController parkingStatusController) {
-        this.parkingEventRepository = parkingEventRepository;
+    public ParkingService(ParkingCountRepository parkingCountRepository, ParkingStatusRepository parkingStatusRepository, ParkingSpotController parkingSpotController, ParkingCountController parkingCountController, ParkingStatusController parkingStatusController) {
         this.parkingCountRepository = parkingCountRepository;
         this.parkingStatusRepository = parkingStatusRepository;
         this.parkingSpotController = parkingSpotController;
@@ -59,7 +55,6 @@ public class ParkingService {
         parkingCount.setCarsInParking(0);
         parkingCount.setDate(date);
         parkingCountRepository.save(parkingCount);
-        parkingEventRepository.deleteAll();
     }
 
     public void updateParkingCount() {
@@ -126,13 +121,6 @@ public class ParkingService {
         
         parkingStatusRepository.save(status);
         parkingStatusController.updateParkingStatus();
-    }
-
-    public void logParkingEvent(String eventType) {
-        ParkingEvent event = new ParkingEvent();
-        event.setTimestamp(OffsetDateTime.now());
-        event.setEvent(eventType);
-        parkingEventRepository.save(event);
     }
 
     public String getIdentificationCode() {
