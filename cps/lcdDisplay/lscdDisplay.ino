@@ -5,8 +5,8 @@
 #include <LiquidCrystal_I2C.h>
 
 // WiFi configuration
-const char *ssid = "WLAN-571794";
-const char *password = "93940861556538256318";
+const char *ssid = "FES-SuS";
+const char *password = "SuS-WLAN!Key24";
 
 // MQTT configuration
 const char *mqtt_server = "gruppe1iot.local";
