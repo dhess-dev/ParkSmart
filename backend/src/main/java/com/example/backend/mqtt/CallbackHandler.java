@@ -49,20 +49,28 @@ public class CallbackHandler implements MqttCallback {
         switch (topic) {
             case "backend/parking/gate/validation/rfid" -> {
                 String cardCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-                if (gateAccessController.getGateAccessByRfidCode(cardCode) != null && parkingStatusController.getLatest().getFreeSpots() > 0) {
-                    parkingService.setIdentificationCode(cardCode);
-                    parkingService.setEntryGateOpened(true);
-                    mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
-                }
+                if (gateAccessController.getGateAccessByRfidCode(cardCode) != null) {
+                    if (!parkingService.isEntryGateOpened()) {
+                        if (parkingStatusController.getLatest().getFreeSpots() > 0) {
+                            parkingService.setIdentificationCode(cardCode);
+                            parkingService.setEntryGateOpened(true);
+                            mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
+                        } else mqttClientManager.publishMessage("cps/parking/full", "1");
+                    }
+                } else mqttClientManager.publishMessage("backend/parking/gate/validation/rfid/error", "1");
             }
 
             case "backend/parking/gate/validation/qrCode" -> {
                 String qrCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-                if (gateAccessController.getGateAccessByQrCode(qrCode) != null && !parkingService.isEntryGateOpened() && parkingStatusController.getLatest().getFreeSpots() > 0) {
-                    parkingService.setEntryGateOpened(true);
-                    parkingService.setIdentificationCode(qrCode);
-                    mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
-                }
+                if (gateAccessController.getGateAccessByQrCode(qrCode) != null) {
+                    if (!parkingService.isEntryGateOpened()) {
+                        if (parkingStatusController.getLatest().getFreeSpots() > 0) {
+                            parkingService.setEntryGateOpened(true);
+                            parkingService.setIdentificationCode(qrCode);
+                            mqttClientManager.publishMessage("cps/parking/gate/entry/open", "1");
+                        } else mqttClientManager.publishMessage("cps/parking/full", "1");
+                    }
+                } else mqttClientManager.publishMessage("backend/parking/gate/validation/qrCode/error", "1");
             }
 
             case "backend/parking/distance/spot/A1" -> {
@@ -98,6 +106,11 @@ public class CallbackHandler implements MqttCallback {
             case "backend/parking/gate/exit/open" -> {
                 String payload = new String(message.getPayload());
                 parkingService.setExitGateOpened(payload.equals("1"));
+            }
+
+            case "backend/parking/request/spots/count" -> {
+                int freeParkinigSpotsCount = parkingStatusController.getLatest().getFreeSpots();
+                mqttClientManager.publishMessage("cps/parking/spots/count", String.valueOf(freeParkinigSpotsCount));
             }
         }
     }
