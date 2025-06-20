@@ -3,7 +3,6 @@ import { BarChart, Gauge, LineChart, gaugeClasses} from "@mui/x-charts";
 import { Container, Grid, Paper, Typography } from "@mui/material";
 
 export default function Dashboard() {
-  const [freeParkingSpotsCount, setFreeParkingSpotsCount] = useState([]);
   const [parkingCount, setParkingCount] = useState([]);
   const [freeParkingSpotsHistory, setFreeParkingSpotsHistory] = useState([]);
   const [gaugeValue, setGaugeValue] = useState(0);
@@ -77,7 +76,6 @@ export default function Dashboard() {
       if (!response.ok) throw new Error("Failed to fetch initial data");
       const initialData = await response.json();
 
-      setFreeParkingSpotsCount(initialData);
       setFreeParkingSpotsHistory(processParkingData(initialData));
       setGaugeValue(initialData && initialData.length > 0
         ? initialData[initialData.length - 1].freeSpots
@@ -99,10 +97,9 @@ export default function Dashboard() {
 
       const parsed = Array.isArray(data) ? data : [data];
 
-      setFreeParkingSpotsCount(parsed);
       setFreeParkingSpotsHistory(processParkingData(parsed));
-      setGaugeValue(initialData && initialData.length > 0
-        ? initialData[initialData.length - 1].freeSpots
+      setGaugeValue(parsed && parsed.length > 0
+        ? parsed[parsed.length - 1].freeSpots
         : 0)
     } catch (err) {
       console.error("Error parsing SSE data", err);
@@ -126,7 +123,7 @@ return (
       <Grid item xs={12} md={6} lg={4}>
         <Paper elevation={3} sx={{ p: 2, height: 400, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
           <Typography variant="h6" gutterBottom>
-            Auslastung der Parkplätze
+            Freie Parkplätze
           </Typography>
           <Gauge
             width={300}
@@ -139,12 +136,13 @@ return (
             sx={(theme) => ({
               [`& .${gaugeClasses.valueText}`]: {
                 fontSize: 40,
+                fill: gaugeValue === 0 ? "#f44336" : theme.palette.text.primary,
               },
               [`& .${gaugeClasses.valueArc}`]: {
-                fill: gaugeValue >= 4 ? "#f44336" : "#2196f3",
+                fill: gaugeValue > 0 ? "#2196f3" : "transparent",
               },
               [`& .${gaugeClasses.referenceArc}`]: {
-                fill: theme.palette.text.disabled,
+                fill: gaugeValue === 0 ? "#f44336" : theme.palette.text.disabled,
               },
             })}
           />
@@ -188,7 +186,7 @@ return (
       <Grid item xs={12}>
         <Paper elevation={3} sx={{ p: 3 }}>
           <Typography align="center" variant="h6" gutterBottom>
-            Anzahl der Fahrzeuge in den letzten 5 Tagen
+            Anzahl der Besucher in den letzten 5 Tagen
           </Typography>
           <BarChart
             dataset={parkingCount}
