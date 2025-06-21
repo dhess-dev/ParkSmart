@@ -76,13 +76,10 @@ public class CallbackHandler implements MqttCallback {
                 } else mqttClientManager.publishMessage("backend/parking/gate/validation/qrCode/error", "1");
             }
 
-            case "backend/parking/distance/spot/A1" -> {
-                parkingService.handleSpotDistanceUpdate("A1", message);
-            }
-
-            case "backend/parking/distance/spot/A2" -> {
-                parkingService.handleSpotDistanceUpdate("A2", message);
-            }
+            case "backend/parking/distance/spot/A1" -> parkingService.handleSpotDistanceUpdate("A1", message);
+            case "backend/parking/distance/spot/A2" -> parkingService.handleSpotDistanceUpdate("A2", message);
+            case "backend/parking/distance/spot/A3" -> parkingService.handleSpotDistanceUpdate("A3", message);
+            case "backend/parking/distance/spot/A4" -> parkingService.handleSpotDistanceUpdate("A4", message);
 
             case "backend/parking/distance/gate" -> {
                 String payload = new String(message.getPayload());

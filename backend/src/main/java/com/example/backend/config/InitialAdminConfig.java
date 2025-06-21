@@ -50,17 +50,15 @@ public class InitialAdminConfig {
             }
             if (parkingSpotRepository.count() == 0) {
                 List<String> positions = List.of(
-                        "A1", "A2", "A3", "A4", "A5",
-                        "B1", "B2", "B3", "B4", "B5"
+                        "A1", "A2", "A3", "A4"
                 );
 
                 for (int i = 0; i < positions.size(); i++) {
                     ParkingSpot spot = new ParkingSpot();
                     spot.setPosition(positions.get(i));
-                    spot.setOccupied(i != 0);
                     parkingSpotRepository.save(spot);
                 }
-                System.out.println("Seeded " + positions.size() + " parking spots (only A1 is free).");
+                System.out.println("Seeded " + positions.size());
             } else {
                 System.out.println("Parking spots already exist: count="
                         + parkingSpotRepository.count());
