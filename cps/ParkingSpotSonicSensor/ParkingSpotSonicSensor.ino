@@ -191,7 +191,7 @@ void loop() {
   Serial.print("DistanceA3 (cm): ");
   Serial.println(distanceA3);
 
-    Serial.print("DistanceA4(cm): ");
+    Serial.print("DistanceA4 (cm): ");
   Serial.println(distanceA4);
 
   String payloadA1 = String(distanceA1, 2);
