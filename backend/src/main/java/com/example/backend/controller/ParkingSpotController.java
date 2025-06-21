@@ -43,6 +43,9 @@ public class ParkingSpotController {
         return updatedSpot;
     }
 
+    public ParkingSpot getParkingSpotByPosition(String position) {
+        return repository.findByPosition(position).orElse(null);
+    }
 
 }
 

@@ -87,24 +87,12 @@ public class ParkingService {
             throw new IllegalArgumentException("Invalid distance payload: " + payload);
         }
 
-        boolean isOccupied = distance <= PARKING_SPOT_OCCUPIED_DISTANCE;
-        boolean currentStatus;
+        boolean currentlyOccupied = distance <= PARKING_SPOT_OCCUPIED_DISTANCE;
+        boolean previouslyOccupied = parkingSpotController.getParkingSpotByPosition(spotId).isOccupied();
 
-        switch (spotId) {
-            case "A1" -> currentStatus = spotA1Occupied;
-            case "A2" -> currentStatus = spotA2Occupied;
-            default -> throw new IllegalArgumentException("Unknown spot ID: " + spotId);
-        }
-
-        if (isOccupied != currentStatus) {
-            switch (spotId) {
-                case "A1" -> setSpotA1Occupied(isOccupied);
-                case "A2" -> setSpotA2Occupied(isOccupied);
-            }
-
+        if (currentlyOccupied != previouslyOccupied) {
             parkingSpotController.updateSpot(spotId);
-            System.out.println("cps/parking/spot/" + spotId + "/isOccupied");
-            mqttClientManager.publishMessage("cps/parking/spot/" + spotId + "/isOccupied", isOccupied ? "1" : "0");
+            mqttClientManager.publishMessage("cps/parking/spot/" + spotId + "/isOccupied", currentlyOccupied ? "1" : "0");
         }
     }
 
