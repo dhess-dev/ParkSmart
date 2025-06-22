@@ -35,7 +35,7 @@ export default function Plans() {
 
   return (
     <div>
-      <h2>Parking Plans</h2>
+      <h2>Parkplatz buchen</h2>
       <Grid container spacing={3}>
         {plans.map((plan) => (
           <Grid item xs={12} sm={6} md={4} key={plan.id}>
@@ -48,10 +48,10 @@ export default function Plans() {
                   {plan.description}
                 </Typography>
                 <Typography variant="h6" color="text.primary">
-                  ${plan.price}
+                  {plan.price} €
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {plan.duration === null ? "Unlimited" : `${plan.duration} days`}
+                  {plan.duration} {plan.duration > 1 ? "Tage" : "Tag"}
                 </Typography>
               </CardContent>
               <CardActions>
@@ -60,7 +60,7 @@ export default function Plans() {
                   color="primary"
                   onClick={() => handlePurchase(plan.id)}
                 >
-                  Purchase
+                  Buchen
                 </Button>
               </CardActions>
             </Card>

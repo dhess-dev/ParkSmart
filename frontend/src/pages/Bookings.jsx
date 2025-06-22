@@ -30,19 +30,19 @@ export default function Bookings() {
 
   return (
     <div>
-      <h2>My Bookings</h2>
+      <h2>Meine Buchungen</h2>
       <ul>
         {bookings.map((booking) => (
           <li key={booking.id}>
             <p>
-              <strong>Type:</strong> {booking.type}
+              <strong>Typ:</strong> {booking.type}
             </p>
             <p>
               <strong>Start:</strong>{" "}
               {new Date(booking.startTime).toLocaleString()}
             </p>
             <p>
-              <strong>End:</strong> {new Date(booking.endTime).toLocaleString()}
+              <strong>Ende:</strong> {new Date(booking.endTime).toLocaleString()}
             </p>
             <img
               src={`${apiUrl}/api/bookings/qrcode/${booking.qrCodeContent}`}
@@ -60,11 +60,11 @@ export default function Bookings() {
 
     
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>QR Code</DialogTitle>
+        <DialogTitle>QR-Code</DialogTitle>
         <DialogContent style={{ textAlign: "center" }}>
           <img
             src={selectedQrCode}
-            alt="QR Code"
+            alt="QR-Code"
             style={{ width: "100%", maxWidth: "400px", height: "auto" }}
           />
         </DialogContent>
