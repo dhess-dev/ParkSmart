@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.example.backend.controller.BookingController;
 import com.example.backend.controller.GateAccessController;
+import com.example.backend.services.BookingService;
 import com.example.backend.controller.ParkingStatusController;
 import com.example.backend.services.ParkingService;
 
@@ -22,16 +22,16 @@ public class CallbackHandler implements MqttCallback {
     private static final Logger logger = LoggerFactory.getLogger(CallbackHandler.class);
 
     private final GateAccessController gateAccessController;
-    private final BookingController bookingController;
+    private final BookingService bookingService;
     private final ParkingService parkingService;
     private final ParkingStatusController parkingStatusController;
 
     private ClientManager mqttClientManager;
 
-    public CallbackHandler(GateAccessController gateAccessController, ParkingService parkingService, BookingController bookingController, ParkingStatusController parkingStatusController) {
+    public CallbackHandler(GateAccessController gateAccessController, ParkingService parkingService, BookingService bookingService, ParkingStatusController parkingStatusController) {
         this.gateAccessController = gateAccessController;
         this.parkingService = parkingService;
-        this.bookingController = bookingController;
+        this.bookingService = bookingService;
         this.parkingStatusController = parkingStatusController;
     }
 
@@ -65,7 +65,7 @@ public class CallbackHandler implements MqttCallback {
 
             case "backend/parking/gate/validation/qrCode" -> {
                 String qrCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-                if (bookingController.getBookingByQrCode(qrCode) != null) {
+                if (bookingService.getBookingByQrCode(qrCode) != null) {
                     if (!parkingService.isEntryGateOpened()) {
                         if (parkingStatusController.getLatest().getFreeSpots() > 0) {
                             parkingService.setEntryGateOpened(true);

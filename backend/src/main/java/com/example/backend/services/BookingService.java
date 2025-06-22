@@ -1,5 +1,13 @@
 package com.example.backend.services;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
 import com.example.backend.models.Booking;
 import com.example.backend.models.User;
 import com.example.backend.repositories.BookingRepository;
@@ -8,16 +16,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import org.springframework.stereotype.Service;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
 
 @Service
 public class BookingService {
@@ -57,5 +56,9 @@ public class BookingService {
 
     public List<Booking> getBookingsByUser(User user) {
         return bookingRepository.findByUser(user);
+    }
+
+    public Booking getBookingByQrCode(String qrCode) {
+        return bookingRepository.findByQrCodeContent(qrCode).orElse(null);
     }
 }
