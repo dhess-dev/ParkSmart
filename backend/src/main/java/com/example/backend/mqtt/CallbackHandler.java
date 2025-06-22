@@ -109,8 +109,8 @@ public class CallbackHandler implements MqttCallback {
             }
 
             case "backend/parking/request/spots/count" -> {
-                int freeParkinigSpotsCount = parkingStatusController.getLatest().getFreeSpots();
-                mqttClientManager.publishMessage("cps/parking/spots/count", String.valueOf(freeParkinigSpotsCount));
+                int freeParkingSpotsCount = parkingStatusController.getLatest().getFreeSpots();
+                mqttClientManager.publishMessage("cps/parking/spots/count", String.valueOf(freeParkingSpotsCount));
             }
         }
     }
