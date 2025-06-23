@@ -25,21 +25,21 @@ export default function Register() {
     const fieldsConfig = [
         {name: "username", label: "Username", xs: 12, required: true},
         {name: "email", label: "Email", xs: 12, required: true},
-        {name: "password", label: "Password", xs: 12, required: true, type: "password"},
-        {name: "confirm", label: "Confirm Password", xs: 12, required: true, type: "password"},
+        {name: "password", label: "Passwort", xs: 12, required: true, type: "password"},
+        {name: "confirm", label: "Passwort bestätigen", xs: 12, required: true, type: "password"},
 
-        {name: "firstName", label: "First Name", required: true, xs: 6},
-        {name: "lastName", label: "Last Name", required: true, xs: 6},
-        {name: "phoneNumber", label: "Phone Number", required: true, xs: 6},
-        {name: "address", label: "Address", required: true, xs: 6},
-        {name: "city", label: "City", required: true, xs: 4},
-        {name: "postalCode", label: "Postal Code", required: true, xs: 4},
-        {name: "country", label: "Country", required: true, xs: 4},
+        {name: "firstName", label: "Vorname", required: true, xs: 6},
+        {name: "lastName", label: "Nachname", required: true, xs: 6},
+        {name: "phoneNumber", label: "Telefonnummer", required: true, xs: 6},
+        {name: "address", label: "Adresse", required: true, xs: 6},
+        {name: "city", label: "Stadt", required: true, xs: 4},
+        {name: "postalCode", label: "Postleitzahl", required: true, xs: 4},
+        {name: "country", label: "Land", required: true, xs: 4},
     ];
 
     const handleSubmit = async (values) => {
         if (values.password !== values.confirm) {
-            return alert("Passwords don’t match");
+            return alert("Passwörter stimmen nicht überein");
         }
 
         const {confirm: _, ...payload} = values;
@@ -54,7 +54,7 @@ export default function Register() {
             if (!res.ok) throw new Error(await res.text());
             navigate("/login");
         } catch (err) {
-            alert("Register failed: " + err.message);
+            alert("Registrierung fehlgeschlagen: " + err.message);
         } finally {
             setLoading(false);
         }

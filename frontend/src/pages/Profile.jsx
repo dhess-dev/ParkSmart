@@ -55,7 +55,7 @@ export default function Profile() {
                 initialValues={user}
                 fieldsConfig={userFieldsConfig}
                 onSubmit={handleSave}
-                submitText="Save Changes"
+                submitText="Änderungen speichern"
                 loading={saving}
             />
         </Container>

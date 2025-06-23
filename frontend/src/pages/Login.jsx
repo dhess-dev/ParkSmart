@@ -46,10 +46,10 @@ export default function Login({onLogin}) {
                 onChange={e => setUsername(e.target.value)} required
             />
             <TextField
-                label="Password" type="password" value={password}
+                label="Passwort" type="password" value={password}
                 onChange={e => setPassword(e.target.value)} required
             />
-            <Button type="submit" variant="contained">Log In</Button>
+            <Button type="submit" variant="contained">Login</Button>
             {error && <Typography color="error">{error}</Typography>}
         </Box>
     );

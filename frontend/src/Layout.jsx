@@ -35,13 +35,12 @@ export default function Layout({ user, onLogout, mode, setMode }) {
       <List>
         {[
           { label: "Home", to: "/" },
-          { label: "About", to: "/about" },
           { label: "Dashboard", to: "/dashboard" },
-          { label: "My Bookings", to: "/bookings" },
-          { label: "Book Plans", to: "/plans" },
+          { label: "Meine Buchungen", to: "/bookings" },
+          { label: "Parkplatz buchen", to: "/plans" },
           ...(user
             ? [
-                { label: "Profile", to: "/profile" },
+                { label: "Profil", to: "/profile" },
                 ...(user.roles.includes("ADMIN")
                   ? [{ label: "Admin", to: "/admin" }]
                   : []),
@@ -104,7 +103,7 @@ export default function Layout({ user, onLogout, mode, setMode }) {
                                     setAnchorEl(null);
                                     navigate("/profile");
                                 }}>
-                                    Profile
+                                    Profil
                                 </MenuItem>
                                 {user.roles.includes("ADMIN") && (
                                     <MenuItem onClick={() => {
@@ -130,7 +129,7 @@ export default function Layout({ user, onLogout, mode, setMode }) {
                                 color="inherit"
                                 sx={{mr: 1}}
                             >
-                                Register
+                                Registrieren
                             </Button>
                             <Button
                                 component={Link}
