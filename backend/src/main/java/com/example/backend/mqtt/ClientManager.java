@@ -38,7 +38,7 @@ public class ClientManager {
     private final ParkingSpotSseService sseService;
 
     public ClientManager(
-            @Value("${MQTT_BROKER_URL:tcp://gruppe1iot.local:1883}") String mqttBrokerUrl,
+            @Value("${MQTT_BROKER_URL:tcp://gruppe1iot-dev.local:1883}") String mqttBrokerUrl,
             @Value("${MQTT_USERNAME:gruppe1}") String mqttUsername,
             @Value("${MQTT_PASSWORD:gruppe1}") String mqttPassword,
             CallbackHandler callbackHandler, ParkingSpotSseService sseService
