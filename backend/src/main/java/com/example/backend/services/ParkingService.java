@@ -24,8 +24,6 @@ import com.example.backend.repositories.ParkingStatusRepository;
 public class ParkingService {
 
     private String identificationCode;
-    private boolean spotA1Occupied;
-    private boolean spotA2Occupied;
     private boolean entryGateOpened;
     private boolean exitGateOpened;
 
@@ -38,7 +36,7 @@ public class ParkingService {
     private final ParkingSpotController parkingSpotController;
     private final ParkingCountController parkingCountController;
     private final ParkingStatusController parkingStatusController;
-    private final int PARKING_SPOT_OCCUPIED_DISTANCE = 5;
+    private final int PARKING_SPOT_OCCUPIED_DISTANCE = 11;
 
     public ParkingService(ParkingCountRepository parkingCountRepository, ParkingStatusRepository parkingStatusRepository, ParkingSpotController parkingSpotController, ParkingCountController parkingCountController, ParkingStatusController parkingStatusController) {
         this.parkingCountRepository = parkingCountRepository;
@@ -117,22 +115,6 @@ public class ParkingService {
 
     public void setIdentificationCode(String identificationCode) {
         this.identificationCode = identificationCode;
-    }
-
-    public boolean isSpotA1Occupied() {
-        return spotA1Occupied;
-    }
-
-    public void setSpotA1Occupied(boolean spotA1Occupied) {
-        this.spotA1Occupied = spotA1Occupied;
-    }
-
-    public boolean isSpotA2Occupied() {
-        return spotA2Occupied;
-    }
-
-    public void setSpotA2Occupied(boolean spotA2Occupied) {
-        this.spotA2Occupied = spotA2Occupied;
     }
 
     public boolean isEntryGateOpened() {
