@@ -1,9 +1,5 @@
 #include <WiFi.h>
 #include <AsyncMQTT_ESP32.h>
-#include <MFRC522v2.h>
-#include <MFRC522DriverSPI.h>
-#include <MFRC522DriverPinSimple.h>
-#include <ESP32Servo.h>
 
 // WiFi configuration
 // WiFi configuration
@@ -196,18 +192,15 @@ void loop() {
 
   String payloadA1 = String(distanceA1, 2);
   mqttClient.publish("backend/parking/distance/spot/A1", 0, false, payloadA1.c_str());
-  delay(500);
 
   String payloadA2 = String(distanceA2, 2);
   mqttClient.publish("backend/parking/distance/spot/A2", 0, false, payloadA2.c_str());
-  delay(500);
-  
+
   String payloadA3 = String(distanceA3, 2);
   mqttClient.publish("backend/parking/distance/spot/A3", 0, false, payloadA3.c_str());
-  delay(500);
-  
+
   String payloadA4 = String(distanceA4, 2);
   mqttClient.publish("backend/parking/distance/spot/A4", 0, false, payloadA4.c_str());
-  delay(500);
   // Small delay to avoid overloading the loop
+  delay(500);
 }
