@@ -15,4 +15,6 @@ public interface ParkingStatusRepository extends JpaRepository<ParkingStatus, Lo
 
     @Query(value = "SELECT free_spots FROM parking_status ORDER BY timestamp DESC LIMIT 1", nativeQuery = true)
     int getLatestParkingSpots();
+
+    ParkingStatus findFirstByOrderByTimestampDesc();
 }
