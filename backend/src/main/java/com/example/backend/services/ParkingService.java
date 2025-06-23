@@ -24,10 +24,6 @@ import com.example.backend.repositories.ParkingStatusRepository;
 public class ParkingService {
 
     private String identificationCode;
-    private boolean spotA1Occupied;
-    private boolean spotA2Occupied;
-    private boolean spotA3Occupied;
-    private boolean spotA4Occupied;
     private boolean entryGateOpened;
     private boolean exitGateOpened;
 
@@ -121,28 +117,6 @@ public class ParkingService {
         this.identificationCode = identificationCode;
     }
 
-    public boolean isSpotA1Occupied() {
-        return spotA1Occupied;
-    }
-
-    public void setSpotA1Occupied(boolean spotA1Occupied) {
-        this.spotA1Occupied = spotA1Occupied;
-    }
-
-    public boolean isSpotA2Occupied() {
-        return spotA2Occupied;
-    }
-
-    public void setSpotA2Occupied(boolean spotA2Occupied) {
-        this.spotA2Occupied = spotA2Occupied;
-    }
-    public void setSpotA3Occupied(boolean spot3Occupied) {
-        this.spotA3Occupied = spot3Occupied;
-    }
-
-    public boolean isSpotA3Occupied() {
-        return spotA3Occupied;
-    }
     public boolean isEntryGateOpened() {
         return entryGateOpened;
     }
@@ -157,13 +131,5 @@ public class ParkingService {
 
     public void setExitGateOpened(boolean exitGateOpened) {
         this.exitGateOpened = exitGateOpened;
-    }
-
-    public boolean isSpotA4Occupied() {
-        return spotA4Occupied;
-    }
-
-    public void setSpotA4Occupied(boolean spotA4Occupied) {
-        this.spotA4Occupied = spotA4Occupied;
     }
 }
