@@ -11,6 +11,4 @@ import com.example.backend.models.GateAccess;
 public interface GateAccessRepository extends JpaRepository<GateAccess, Long> {
 
     Optional<GateAccess> findByRfidCode(String rfidCode);
-
-    Optional<GateAccess> findByQrCodeContent(String qrCodeContent);
 }

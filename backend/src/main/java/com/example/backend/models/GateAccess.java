@@ -16,8 +16,6 @@ public class GateAccess {
 
     private String rfidCode;
 
-    private String qrCodeContent;
-
     public Long getId() {
         return id;
     }
@@ -32,13 +30,5 @@ public class GateAccess {
 
     public void setRfidCode(String rfidCode) {
         this.rfidCode = rfidCode;
-    }
-
-    public String getQrCodeContent() {
-        return qrCodeContent;
-    }
-
-    public void setQrCodeContent(String qrCodeContent) {
-        this.qrCodeContent = qrCodeContent;
     }
 }

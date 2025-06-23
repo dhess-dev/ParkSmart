@@ -1,14 +1,20 @@
 package com.example.backend.controller;
 
-import com.example.backend.models.Booking;
-import com.example.backend.models.User;
-import com.example.backend.services.BookingService;
-import com.example.backend.repositories.UserRepository;
+import java.time.OffsetDateTime;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.OffsetDateTime;
+import com.example.backend.models.Booking;
+import com.example.backend.models.User;
+import com.example.backend.repositories.UserRepository;
+import com.example.backend.services.BookingService;
 
 @RestController
 @RequestMapping("/api/bookings")

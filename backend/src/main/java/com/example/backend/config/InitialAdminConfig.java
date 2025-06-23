@@ -68,7 +68,6 @@ public class InitialAdminConfig {
 
             if (gateAccessRepository.count() == 0) {
                 GateAccess access = new GateAccess();
-                access.setQrCodeContent("5769b876-b5d1-4f80-8bbb-cd4561ba56a6");
                 access.setRfidCode("256DA883");
                 gateAccessRepository.save(access);
             }

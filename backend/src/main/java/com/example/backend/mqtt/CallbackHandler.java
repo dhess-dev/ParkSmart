@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.example.backend.controller.GateAccessController;
+import com.example.backend.services.BookingService;
 import com.example.backend.controller.ParkingStatusController;
 import com.example.backend.services.ParkingService;
 
@@ -21,14 +22,16 @@ public class CallbackHandler implements MqttCallback {
     private static final Logger logger = LoggerFactory.getLogger(CallbackHandler.class);
 
     private final GateAccessController gateAccessController;
+    private final BookingService bookingService;
     private final ParkingService parkingService;
     private final ParkingStatusController parkingStatusController;
 
     private ClientManager mqttClientManager;
 
-    public CallbackHandler(GateAccessController gateAccessController, ParkingService parkingService, ParkingStatusController parkingStatusController) {
+    public CallbackHandler(GateAccessController gateAccessController, ParkingService parkingService, BookingService bookingService, ParkingStatusController parkingStatusController) {
         this.gateAccessController = gateAccessController;
         this.parkingService = parkingService;
+        this.bookingService = bookingService;
         this.parkingStatusController = parkingStatusController;
     }
 
@@ -62,7 +65,7 @@ public class CallbackHandler implements MqttCallback {
 
             case "backend/parking/gate/validation/qrCode" -> {
                 String qrCode = new String(message.getPayload(), StandardCharsets.UTF_8);
-                if (gateAccessController.getGateAccessByQrCode(qrCode) != null) {
+                if (bookingService.getBookingByQrCode(qrCode) != null) {
                     if (!parkingService.isEntryGateOpened()) {
                         if (parkingStatusController.getLatest().getFreeSpots() > 0) {
                             parkingService.setEntryGateOpened(true);
@@ -88,7 +91,6 @@ public class CallbackHandler implements MqttCallback {
                     String eventType = "entry";
                     mqttClientManager.publishMessage("cps/parking/gate/entry/open", "0");
                     parkingService.setEntryGateOpened(false);
-                    parkingService.logParkingEvent(eventType);
                     parkingService.createParkingStatusEntry(eventType);
                     parkingService.updateParkingCount();
                 }
@@ -98,7 +100,6 @@ public class CallbackHandler implements MqttCallback {
                     String eventType = "exit";
                     mqttClientManager.publishMessage("cps/parking/gate/exit/open", "1");
                     parkingService.setExitGateOpened(true);
-                    parkingService.logParkingEvent(eventType);
                     parkingService.createParkingStatusEntry(eventType);
                 }
             }
