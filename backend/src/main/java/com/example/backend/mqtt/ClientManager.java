@@ -75,6 +75,7 @@ public class ClientManager {
                 options.setCleanSession(true);
                 mqttClient.connect(options);
                 logger.info("Successfully connected to MQTT broker.");
+                subscribeAllTopics();
             }
         } catch (MqttException e) {
             logger.error("Error while connecting to MQTT broker: {} (Error Code: {})", e.getMessage(), e.getReasonCode());
