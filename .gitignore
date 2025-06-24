@@ -34,5 +34,5 @@ backend/client_*
 *.temp
 *.sublime-workspace
 *.sublime-project
-
+*.pem
 
