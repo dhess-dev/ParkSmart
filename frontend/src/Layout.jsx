@@ -27,14 +27,13 @@ export default function Layout({ user, onLogout, mode, setMode }) {
   const navigate = useNavigate();
   const pageTitle = {
     "/": "Home",
-    "/about": "About",
     "/dashboard": "Dashboard",
-    "/bookings": "My Bookings",
-    "/plans": "Book Plans",
-    "/profile": "Profile",
+    "/bookings": "Meine Buchungen",
+    "/plans": "Parkplatz buchen",
+    "/profile": "Profil",
     "/admin": "Admin",
     "/login": "Login",
-    "/register": "Register",
+    "/register": "Registeren",
   };
   const currentPage = pageTitle[location.pathname] || "My App";
   const drawer = (
