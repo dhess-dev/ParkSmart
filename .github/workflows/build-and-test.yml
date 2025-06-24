@@ -70,11 +70,12 @@ jobs:
             sleep 5;
           done
 
-      - name: Decode cert.pem and key.pem into frontend
-        working-directory: frontend
+      - name: Decode cert.pem and key.pem into certs/
         run: |
-          echo "${{ secrets.CERT_PEM_BASE64 }}" | base64 -d > cert.pem
-          echo "${{ secrets.KEY_PEM_BASE64 }}" | base64 -d > key.pem
+          mkdir -p certs
+          echo "${{ secrets.CERT_PEM_BASE64 }}" | base64 -d > certs/cert.pem
+          echo "${{ secrets.KEY_PEM_BASE64 }}" | base64 -d > certs/key.pem
+      
 
       - name: Install frontend dependencies
         working-directory: frontend
