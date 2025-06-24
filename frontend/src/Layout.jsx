@@ -1,4 +1,4 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import { Outlet, Link, useNavigate, useLocation  } from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -25,7 +25,18 @@ export default function Layout({ user, onLogout, mode, setMode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
-
+  const pageTitle = {
+    "/": "Home",
+    "/about": "About",
+    "/dashboard": "Dashboard",
+    "/bookings": "My Bookings",
+    "/plans": "Book Plans",
+    "/profile": "Profile",
+    "/admin": "Admin",
+    "/login": "Login",
+    "/register": "Register",
+  };
+  const currentPage = pageTitle[location.pathname] || "My App";
   const drawer = (
     <Box sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
@@ -77,7 +88,7 @@ export default function Layout({ user, onLogout, mode, setMode }) {
           </IconButton>
 
           <Typography variant="h6" noWrap>
-            Dashboard
+            {currentPage}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
 

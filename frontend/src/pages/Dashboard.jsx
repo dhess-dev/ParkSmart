@@ -117,17 +117,16 @@ export default function Dashboard() {
 }, []);
 
 return (
-  <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+  <Container maxWidth="100%" sx={{ mt: 4, mb: 4 }}>
     <Grid container spacing={3}>
-      {/* Gauge Chart */}
       <Grid item xs={12} md={6} lg={4}>
-        <Paper elevation={3} sx={{ p: 2, height: 400, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper elevation={3} sx={{ p: 2, height: 407, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center" }}>
+          <Typography variant="h6" gutterBottom fontSize={"1.7em"}>
             Freie Parkplätze
           </Typography>
           <Gauge
-            width={300}
-            height={300}
+            width={340}
+            height={250}
             value={gaugeValue}
             valueMin={0}
             valueMax={4}
@@ -149,10 +148,9 @@ return (
         </Paper>
       </Grid>
 
-      {/* Line Chart */}
       <Grid item xs={12} md={6} lg={8}>
         <Paper elevation={3} sx={{ p: 2 }}>
-          <Typography align="center" variant="h6" gutterBottom>
+          <Typography align="center" variant="h6" gutterBottom fontSize={"1.7em"}>
             Historie der freien Parkplätze
           </Typography>
           <LineChart
@@ -162,6 +160,7 @@ return (
                 data: freeParkingSpotsHistory.map((d) => d.time),
                 scaleType: "time",
                 label: "Zeit",
+                labelStyle: { fontSize: "1.0em"},
               },
             ]}
             yAxis={[
@@ -178,15 +177,26 @@ return (
                 color: "#2196f3",
               },
             ]}
+            slotProps={{
+              noDataOverlay: {
+                sx: {
+                  fontSize: "1.2em",
+                },
+              },
+            }}
+            sx={{
+              "& .MuiChartsLegend-label": {
+                fontSize: "1.6em",
+              },  "& .MuiChartsAxis-tickLabel tspan": { fontSize: "1.3em" }
+            }}
           />
         </Paper>
       </Grid>
 
-      {/* Bar Chart */}
       <Grid item xs={12}>
-        <Paper elevation={3} sx={{ p: 3 }}>
-          <Typography align="center" variant="h6" gutterBottom>
-            Anzahl der Besucher in den letzten 5 Tagen
+        <Paper elevation={3} sx={{ p: 3,  width:'100%',}}>
+          <Typography align="center" variant="h6" gutterBottom fontSize={"1.7em"}>
+            Anzahl der Besucher in den letzten {parkingCount.length > 0 ? parkingCount.length : "0"} {parkingCount.length === 1 ? "Tag" : "Tagen"}
           </Typography>
           <BarChart
             dataset={parkingCount}
@@ -195,6 +205,8 @@ return (
                 dataKey: "date",
                 scaleType: "band",
                 label: "Datum",
+                labelStyle: { fontSize: "1.0em"},
+                sx: {"& .MuiChartsAxis-tickLabel tspan": { fontSize: "1.6em" }},
               },
             ]}
             series={[
@@ -205,8 +217,23 @@ return (
               },
             ]}
             height={300}
-            width={750}
-          />
+            width={1600}
+            slotProps={{
+              noDataOverlay: {
+                sx: {
+                  fontSize: "1.2rem",
+                },
+              },
+            }}
+            sx={{
+              "& .MuiChartsLegend-label": {
+                fontSize: "1.6em",
+              },  "& .MuiChartsAxis-tickLabel tspan": { fontSize: "1.3em" },
+                "& .MuiChartsAxis-bottom .MuiChartsAxis-label": {
+                transform: "translateY(3%)", 
+              },
+            }}
+          />          
         </Paper>
       </Grid>
     </Grid>
