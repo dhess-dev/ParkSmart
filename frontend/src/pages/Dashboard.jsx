@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { BarChart, Gauge, LineChart } from "@mui/x-charts";
+import { BarChart, Gauge, LineChart, gaugeClasses} from "@mui/x-charts";
+import { Container, Grid, Paper, Typography } from "@mui/material";
 
 export default function Dashboard() {
-  const [freeParkingSpotsCount, setFreeParkingSpotsCount] = useState([]);
   const [parkingCount, setParkingCount] = useState([]);
   const [freeParkingSpotsHistory, setFreeParkingSpotsHistory] = useState([]);
+  const [gaugeValue, setGaugeValue] = useState(0);
   const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
 
   useEffect(() => {
@@ -75,8 +76,10 @@ export default function Dashboard() {
       if (!response.ok) throw new Error("Failed to fetch initial data");
       const initialData = await response.json();
 
-      setFreeParkingSpotsCount(initialData);
       setFreeParkingSpotsHistory(processParkingData(initialData));
+      setGaugeValue(initialData && initialData.length > 0
+        ? initialData[initialData.length - 1].freeSpots
+        : 0)
     } catch (err) {
       console.error("Error fetching initial data for parking status", err);
     }
@@ -94,8 +97,10 @@ export default function Dashboard() {
 
       const parsed = Array.isArray(data) ? data : [data];
 
-      setFreeParkingSpotsCount(parsed);
       setFreeParkingSpotsHistory(processParkingData(parsed));
+      setGaugeValue(parsed && parsed.length > 0
+        ? parsed[parsed.length - 1].freeSpots
+        : 0)
     } catch (err) {
       console.error("Error parsing SSE data", err);
     }
@@ -111,64 +116,127 @@ export default function Dashboard() {
   };
 }, []);
 
-  return (
-    <>
-      <div>
-        <Gauge
-          width={300}
-          height={300}
-          value={
-            freeParkingSpotsCount && freeParkingSpotsCount.length > 0
-              ? freeParkingSpotsCount[freeParkingSpotsCount.length - 1].freeSpots
-              : 0
-          }
-          valueMin={0}
-          valueMax={10}
-          startAngle={-90}
-          endAngle={90}
-        />
+return (
+  <Container maxWidth="100%" sx={{ mt: 4, mb: 4 }}>
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={6} lg={4}>
+        <Paper elevation={3} sx={{ p: 2, height: 413, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center" }}>
+          <Typography variant="h6" gutterBottom fontSize={"1.7em"}>
+            Freie Parkplätze
+          </Typography>
+          <Gauge
+            width={340}
+            height={250}
+            value={gaugeValue}
+            valueMin={0}
+            valueMax={4}
+            startAngle={-90}
+            endAngle={90}
+            sx={(theme) => ({
+              [`& .${gaugeClasses.valueText}`]: {
+                fontSize: 40,
+                fill: gaugeValue === 0 ? "#f44336" : theme.palette.text.primary,
+              },
+              [`& .${gaugeClasses.valueArc}`]: {
+                fill: gaugeValue > 0 ? "#2196f3" : "transparent",
+              },
+              [`& .${gaugeClasses.referenceArc}`]: {
+                fill: gaugeValue === 0 ? "#f44336" : theme.palette.text.disabled,
+              },
+            })}
+          />
+        </Paper>
+      </Grid>
 
-        <LineChart
-          height={300}
-          xAxis={[
-            {
-              data: freeParkingSpotsHistory.map((d) => d.time),
-              scaleType: "time",
-              label: "Zeit",
-            },
-          ]}
-          yAxis={[
-            {
-              label: "Freie Parkplätze",
-              tickMinStep: 1,
-              min: 0,
-            },
-          ]}
-          series={[
-            {
-              data: freeParkingSpotsHistory.map((d) => d.value),
-              label: "Freie Parkplätze",
-            },
-          ]}
-        />
-        <BarChart
-          dataset={parkingCount}
-          xAxis={[
-            {
-              dataKey: "date",
-              scaleType: "band",
-              label: "Datum",
-            }
-          ]}
-          series={[
-            {
-              dataKey: "parkingCount",
-              label: "Anzahl Fahrzeuge",
-            }
-          ]}
-          height={300}
-        />
-      </div>
-    </>
-  );
+      <Grid item xs={12} md={6} lg={8}>
+        <Paper elevation={3} sx={{ p: 2 }}>
+          <Typography align="center" variant="h6" gutterBottom fontSize={"1.7em"}>
+            Historie der freien Parkplätze
+          </Typography>
+          <LineChart
+            height={300}
+            xAxis={[
+              {
+                data: freeParkingSpotsHistory.map((d) => d.time),
+                scaleType: "time",
+                label: "Zeit",
+                labelStyle: { fontSize: "1.0em"},
+              },
+            ]}
+            yAxis={[
+              {
+                label: "Freie Parkplätze",
+                tickMinStep: 1,
+                min: 0,
+              },
+            ]}
+            series={[
+              {
+                data: freeParkingSpotsHistory.map((d) => d.value),
+                label: "Freie Parkplätze",
+                color: "#2196f3",
+              },
+            ]}
+            slotProps={{
+              noDataOverlay: {
+                sx: {
+                  fontSize: "1.2em",
+                },
+              },
+            }}
+            sx={{
+              "& .MuiChartsLegend-label": {
+                fontSize: "1.6em",
+              },  "& .MuiChartsAxis-tickLabel tspan": { fontSize: "1.3em" }
+            }}
+          />
+        </Paper>
+      </Grid>
+
+      <Grid item xs={12}>
+        <Paper elevation={3} sx={{ p: 3,  width:'100%',}}>
+          <Typography align="center" variant="h6" gutterBottom fontSize={"1.7em"}>
+            Anzahl der Besucher in den letzten {parkingCount.length > 0 ? parkingCount.length : "0"} {parkingCount.length === 1 ? "Tag" : "Tagen"}
+          </Typography>
+          <BarChart
+            dataset={parkingCount}
+            xAxis={[
+              {
+                dataKey: "date",
+                scaleType: "band",
+                label: "Datum",
+                labelStyle: { fontSize: "1.0em"},
+                sx: {"& .MuiChartsAxis-tickLabel tspan": { fontSize: "1.6em" }},
+              },
+            ]}
+            series={[
+              {
+                dataKey: "parkingCount",
+                label: "Anzahl Fahrzeuge",
+                color: "#2196f3",
+              },
+            ]}
+            height={300}
+            width={1600}
+            slotProps={{
+              noDataOverlay: {
+                sx: {
+                  fontSize: "1.2rem",
+                },
+              },
+            }}
+            sx={{
+              "& .MuiChartsLegend-label": {
+                fontSize: "1.6em",
+              },  "& .MuiChartsAxis-tickLabel tspan": { fontSize: "1.3em" },
+                "& .MuiChartsAxis-bottom .MuiChartsAxis-label": {
+                transform: "translateY(3%)", 
+              },
+            }}
+          />          
+        </Paper>
+      </Grid>
+    </Grid>
+  </Container>
+);
 }
