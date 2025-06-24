@@ -31,7 +31,7 @@ services:
       MQTT_BROKER_URL: "tcp://host.docker.internal:1883"
       MQTT_USERNAME: "gruppe1"
       MQTT_PASSWORD: "gruppe1"
-      CORS_Origin: "http://gruppe1iot-dev.local:5173"
+      CORS_Origin: "https://gruppe1iot-dev.local:5173"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
@@ -47,7 +47,7 @@ services:
     container_name: groupone_frontend
     platform: linux/arm64
     ports:
-      - "5173:80"
+      - "5173:443"
     depends_on:
       - backend
     environment:
