@@ -120,7 +120,7 @@ return (
   <Container maxWidth="100%" sx={{ mt: 4, mb: 4 }}>
     <Grid container spacing={3}>
       <Grid item xs={12} md={6} lg={4}>
-        <Paper elevation={3} sx={{ p: 2, height: 407, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center" }}>
+        <Paper elevation={3} sx={{ p: 2, height: 413, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center" }}>
           <Typography variant="h6" gutterBottom fontSize={"1.7em"}>
             Freie Parkplätze
           </Typography>
