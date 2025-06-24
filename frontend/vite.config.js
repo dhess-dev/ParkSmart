@@ -4,15 +4,18 @@ import react from "@vitejs/plugin-react";
 import fs from "fs";
 import path from "path";
 
-const certDir = path.resolve(__dirname, "../certs");
-
-const httpsOptions = {
-  key: fs.readFileSync(path.join(certDir, "key.pem")),
-  cert: fs.readFileSync(path.join(certDir, "cert.pem")),
-};
-
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
+
+  const isDev = mode === "development";
+  const certDir = path.resolve(__dirname, "../certs");
+
+  const httpsOptions = isDev
+      ? {
+        key: fs.readFileSync(path.join(certDir, "key.pem")),
+        cert: fs.readFileSync(path.join(certDir, "cert.pem")),
+      }
+      : undefined;
 
   return {
     plugins: [react()],
