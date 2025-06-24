@@ -33,7 +33,7 @@ export default function Layout({ user, onLogout, mode, setMode }) {
     "/profile": "Profil",
     "/admin": "Admin",
     "/login": "Login",
-    "/register": "Registeren",
+    "/register": "Registrieren",
   };
   const currentPage = pageTitle[location.pathname] || "My App";
   const drawer = (
