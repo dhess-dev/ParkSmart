@@ -16,8 +16,8 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy SSL certificates
-COPY cert.pem /etc/nginx/certs/cert.pem
-COPY key.pem  /etc/nginx/certs/key.pem
+COPY certs/cert.pem /etc/ssl/certs/cert.pem
+COPY certs/key.pem  /etc/ssl/private/key.pem
 
 # Copy custom Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
