@@ -3,7 +3,6 @@ package com.example.backend.mqtt;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import com.example.backend.services.ParkingSpotSseService;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -18,6 +17,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import com.example.backend.services.ParkingSpotSseService;
 
 import jakarta.annotation.PostConstruct;
 

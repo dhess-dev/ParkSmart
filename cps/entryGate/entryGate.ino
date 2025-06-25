@@ -11,7 +11,7 @@ const char *ssid = "FES-SuS";
 const char *password = "SuS-WLAN!Key24";
 
 // MQTT configuration
-const char *mqtt_server = "gruppe1iot.local";
+const char *mqtt_server = "gruppe1iot-dev.local";
 const int mqtt_port = 1883;
 const char *mqtt_user = "gruppe1";
 const char *mqtt_password = "gruppe1";
