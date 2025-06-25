@@ -13,7 +13,7 @@ import com.example.backend.models.User;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findByUser(User user);
+    List<Booking> findByUserOrderByStartTimeDesc(User user);
 
     Optional<Booking> findByQrCodeContent(String qrCodeContent);
 }

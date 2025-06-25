@@ -55,7 +55,7 @@ public class BookingService {
     }
 
     public List<Booking> getBookingsByUser(User user) {
-        return bookingRepository.findByUser(user);
+        return bookingRepository.findByUserOrderByStartTimeDesc(user);
     }
 
     public Booking getBookingByQrCode(String qrCode) {
