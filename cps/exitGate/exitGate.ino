@@ -20,11 +20,17 @@ Servo servoExitGate;
 const int servoExitPin = 15;
 
 // Ultra sonic setup
-const int trigPinExitGate = 5;
-const int echoPinExitGate = 7;
 #define SOUND_SPEED 0.034
-long durationGate;
-float distanceGate;
+const int trigPinCloseExitGate = 5;
+const int echoPinCloseExitGate = 7;
+long durationCloseGate;
+float distanceCloseGate;
+
+const int trigPinOpenExitGate = 16;
+const int echoPinOpenExitGate = 17;
+long durationOpenGate;
+float distanceOpenGate;
+
 
 // MQTT Client and timer handles
 AsyncMqttClient mqttClient;
@@ -110,8 +116,10 @@ void setup() {
   // Setup Servo motor
   servoExitGate.attach(servoExitPin);
   // Setup ultra sonic
-  pinMode(trigPinExitGate, OUTPUT);
-  pinMode(echoPinExitGate, INPUT);
+  pinMode(trigPinCloseExitGate, OUTPUT);
+  pinMode(echoPinCloseExitGate, INPUT);
+  pinMode(trigPinOpenExitGate, OUTPUT);
+  pinMode(echoPinOpenExitGate, INPUT);
 
   // Setup timers for MQTT, WiFi, and gate close
   mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
@@ -133,19 +141,39 @@ void setup() {
 }
 
 void loop() {
-  // Ultra Sonic Sensor Gate
-  digitalWrite(trigPinExitGate, LOW);
+  // Ultra Sonic Sensor close Gate
+  digitalWrite(trigPinCloseExitGate, LOW);
   delayMicroseconds(2);
-  digitalWrite(trigPinExitGate, HIGH);
+  digitalWrite(trigPinCloseExitGate, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trigPinExitGate, LOW);
-  durationGate = pulseIn(echoPinExitGate, HIGH);
-  distanceGate = durationGate * SOUND_SPEED / 2;
+  digitalWrite(trigPinCloseExitGate, LOW);
+  durationCloseGate = pulseIn(echoPinCloseExitGate, HIGH);
+  distanceCloseGate = durationCloseGate * SOUND_SPEED / 2;
 
-  Serial.print("DistanceGate (cm SECOND): ");
-  Serial.println(distanceGate);
-  String payloadGate = String(distanceGate, 2);
-  mqttClient.publish("backend/parking/distance/exitGate", 0, false, payloadGate.c_str());
+  Serial.print("distanceCloseGate (cm): ");
+  Serial.println(distanceCloseGate);
+  String payloadCloseGate = String(distanceCloseGate, 2);
+  if (mqttClient.connected()) {
+    mqttClient.publish("backend/parking/distance/close/exitGate", 0, false, payloadCloseGate.c_str());
+  }
+  delay(50);
+
+  // Ultra Sonic Sensor open Gate
+  digitalWrite(trigPinOpenExitGate, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPinOpenExitGate, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinOpenExitGate, LOW);
+  durationOpenGate = pulseIn(echoPinOpenExitGate, HIGH);
+  distanceOpenGate = durationOpenGate * SOUND_SPEED / 2;
+
+  Serial.print("distanceOpenGate (cm): ");
+  Serial.println(distanceOpenGate);
+  String payloadOpenGate = String(distanceOpenGate, 2);
+  if (mqttClient.connected()) {
+    mqttClient.publish("backend/parking/distance/open/exitGate", 0, false, payloadOpenGate.c_str());
+  }
+  delay(50);
 
   // Small delay to avoid overloading the loop
   delay(1000);
