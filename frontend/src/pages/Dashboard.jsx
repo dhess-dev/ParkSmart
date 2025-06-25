@@ -13,7 +13,7 @@ export default function Dashboard() {
             const response = await fetch(`${apiUrl}/api/parkingCount`);
             if (!response.ok) throw new Error("Failed to fetch initial data");
             const initialData = await response.json();
-            console.log("test", initialData);
+            console.log("initialData", initialData);
             const parkingCountObj = initialData.map((entry) => ({
                 date: new Date(entry.date).toLocaleDateString("de-DE"),
                 parkingCount: entry.carsInParking,
@@ -133,9 +133,9 @@ export default function Dashboard() {
                             sx={{
                                 p: 2,
                                 height: 413,
-                                backgroundColor: "rgba(255, 255, 255, 0.05)", // subtle transparent white
-                                backdropFilter: "blur(10px)",                // frosted glass effect
-                                border: "1px solid rgba(255, 255, 255, 0.1)", // soft border for contrast
+                                backgroundColor: "rgba(255, 255, 255, 0.05)", 
+                                backdropFilter: "blur(10px)",                
+                                border: "1px solid rgba(255, 255, 255, 0.1)", 
                                 borderRadius: 3,
                                 color: "white",
                                 display: "flex",
@@ -143,7 +143,6 @@ export default function Dashboard() {
                                 justifyContent: "flex-start",
                                 alignItems: "center",
 
-                                // Chart specific overrides
                                 "& .MuiChartsLegend-label": { color: "white" },
                                 "& .MuiChartsAxis-tickLabel tspan": { fill: "white" },
                                 "& .MuiChartsAxis-bottom .MuiChartsAxis-label": {
@@ -199,7 +198,6 @@ export default function Dashboard() {
                                 borderRadius: 3,
                                 color: "white",
 
-                                // Chart styling
                                 "& .MuiChartsLegend-label": { color: "white", fontSize: "1.6em" },
                                 "& .MuiChartsAxis-tickLabel tspan": { fill: "white", fontSize: "1.3em" },
                                 "& .MuiChartsAxis-bottom .MuiChartsAxis-label": {
@@ -212,7 +210,7 @@ export default function Dashboard() {
                                     stroke: "rgba(255,255,255,0.3)",
                                 },
                                 "& .MuiChartsTooltip-root": {
-                                    color: "black", // Optional: tooltip text
+                                    color: "black", 
                                 },
                             }}
                         >

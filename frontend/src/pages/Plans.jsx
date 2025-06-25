@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardActions, Button, Typography, Grid } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Typography,
+  Grid,
+  Box,
+  Container,
+  Paper,
+} from "@mui/material";
 
 const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
 
@@ -34,39 +44,65 @@ export default function Plans() {
   };
 
   return (
-    <div>
-      <h2>Parkplatz buchen</h2>
-      <Grid container spacing={3}>
-        {plans.map((plan) => (
-          <Grid item xs={12} sm={6} md={4} key={plan.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h5" component="div">
-                  {plan.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {plan.description}
-                </Typography>
-                <Typography variant="h6" color="text.primary">
-                  {plan.price} €
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {plan.duration} {plan.duration > 1 ? "Tage" : "Tag"}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handlePurchase(plan.id)}
-                >
-                  Buchen
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </div>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(to bottom, #001F3F, #003366)",
+        color: "white",
+        py: 4,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Typography variant="h4" gutterBottom align="center">
+          Parkplatz buchen
+        </Typography>
+
+        <Grid container spacing={3}>
+          {plans.map((plan) => (
+            <Grid item xs={12} sm={6} md={4} key={plan.id}>
+              <Paper
+                elevation={3}
+                sx={{
+                  p: 2,
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: 3,
+                  color: "white",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  height: "100%",
+                }}
+              >
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h5" component="div" gutterBottom>
+                    {plan.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    {plan.description}
+                  </Typography>
+                  <Typography variant="h6">{plan.price} €</Typography>
+                  <Typography variant="body2">
+                    {plan.duration} {plan.duration > 1 ? "Tage" : "Tag"}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={() => handlePurchase(plan.id)}
+                    sx={{ mt: 2 }}
+                  >
+                    Buchen
+                  </Button>
+                </CardActions>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </Box>
   );
 }
