@@ -45,6 +45,10 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
+    public List<Booking> findAllBookings() {
+        return bookingRepository.findAll();
+    }
+
     public byte[] generateQRCode(String content) throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, 300, 300);

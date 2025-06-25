@@ -1,20 +1,27 @@
 import { useEffect, useState } from "react";
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import {
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  Typography,
-  Grid,
-  Box,
-  Container,
-  Paper,
+    Card,
+    CardContent,
+    CardActions,
+    Button,
+    Typography,
+    Grid,
+    Box,
+    Container,
+    Paper,
 } from "@mui/material";
-
 const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:8443";
 
 export default function Plans() {
   const [plans, setPlans] = useState([]);
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    severity: "success",
+    message: ""
+  });
 
   useEffect(() => {
     fetch(`${apiUrl}/api/plans`, {
@@ -26,6 +33,11 @@ export default function Plans() {
       .catch((err) => console.error("Failed to fetch plans:", err));
   }, []);
 
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") return;
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
   const handlePurchase = (planId) => {
     fetch(`${apiUrl}/api/plans/purchase`, {
       method: "POST",
@@ -33,14 +45,30 @@ export default function Plans() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ planId }),
     })
-      .then((res) => {
+      .then(async (res) => {
+        const responseText = await res.text();
         if (res.ok) {
-          alert("Plan purchased and booking created successfully!");
+          setSnackbar({
+            open: true,
+            severity: "success",
+            message: responseText
+          });
         } else {
-          alert("Failed to purchase plan.");
+          setSnackbar({
+            open: true,
+            severity: "error",
+            message: "Fehler beim Buchen:\n" + responseText
+          });
         }
       })
-      .catch((err) => console.error("Failed to purchase plan:", err));
+      .catch((err) => {
+        console.error("Failed to purchase plan:", err);
+        setSnackbar({
+          open: true,
+          severity: "error",
+          message: "Fehler beim Buchen: Melden Sie sich beim Kundendienst"
+        });
+      });
   };
 
   return (
@@ -103,6 +131,25 @@ export default function Plans() {
           ))}
         </Grid>
       </Container>
+        <Snackbar
+            open={snackbar.open}
+            autoHideDuration={5000}
+            onClose={handleCloseSnackbar}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+            <Alert
+                onClose={handleCloseSnackbar}
+                severity={snackbar.severity}
+                sx={{
+                    whiteSpace: 'pre-line',
+                    width: '100%',
+                    fontSize: '1.0rem',
+                    padding: '10px',
+                }}
+            >
+                {snackbar.message}
+            </Alert>
+        </Snackbar>
     </Box>
   );
 }
