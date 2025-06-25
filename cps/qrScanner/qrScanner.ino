@@ -7,7 +7,7 @@
 const char *ssid = "FES-SuS";
 const char *password = "SuS-WLAN!Key24";
 // MQTT configuration
-const char *mqtt_server = "gruppe1iot.local";
+const char *mqtt_server = "gruppe1iot-dev.local";
 const int mqtt_port = 1883;
 const char *mqtt_user = "gruppe1";
 const char *mqtt_password = "gruppe1";
@@ -59,8 +59,6 @@ void WiFiEvent(WiFiEvent_t event)
 void onMqttConnect(bool sessionPresent)
 {
     Serial.println("Connected to MQTT");
-    // Subscribe to the "open gate" topic
-    mqttClientCam.subscribe("cps/#", 2);
 }
 
 // MQTT disconnect callback
@@ -94,6 +92,7 @@ void onQrCodeTask(void *pvParameters)
                 Serial.print("Valid payload: ");
                 Serial.println((const char *)qrCodeData.payload);
                 mqttClientCam.publish("backend/parking/gate/validation/qrCode", 0, false, (const char *)qrCodeData.payload);
+                delay(5000);
             }
             else
             {
