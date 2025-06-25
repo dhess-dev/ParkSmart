@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.backend.models.Booking;
 import com.example.backend.models.User;
@@ -22,6 +23,8 @@ import com.google.zxing.qrcode.QRCodeWriter;
 public class BookingService {
 
     private final BookingRepository bookingRepository;
+    private final int MAX_ACTIVE_BOOKINGS_CAPACITY = 4;
+
 
     public BookingService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
@@ -45,8 +48,13 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    public List<Booking> findAllBookings() {
-        return bookingRepository.findAll();
+    @Transactional
+    public Booking tryCreateBookingIfCapacityAvailable(Booking booking) throws IllegalStateException {
+        int activeBookings = bookingRepository.countByEndTimeAfter(OffsetDateTime.now());
+        if (activeBookings >= MAX_ACTIVE_BOOKINGS_CAPACITY) {
+            throw new IllegalStateException("Derzeit sind alle Parkplätze ausgebucht");
+        }
+        return bookingRepository.save(booking);
     }
 
     public byte[] generateQRCode(String content) throws WriterException, IOException {

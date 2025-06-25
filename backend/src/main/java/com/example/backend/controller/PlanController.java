@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -54,10 +53,6 @@ public class PlanController {
 
     @PostMapping("/purchase")
     public ResponseEntity<String> purchasePlan(@RequestBody Map<String, Long> payload, Authentication authentication) {
-        List<Booking> activeBookings = bookingService.findAllBookings().stream().filter(booking -> booking.getEndTime().isAfter(OffsetDateTime.now())).collect(Collectors.toList());
-        if (activeBookings.size() >= 4) {
-            return ResponseEntity.badRequest().body("Derzeit sind alle Parkplätze ausgebucht");        
-        }
         Long planId = payload.get("planId");
         if (planId == null) {
             return ResponseEntity.badRequest().body("planId ist nicht vorhanden");
@@ -87,8 +82,11 @@ public class PlanController {
         }
 
         booking.setQrCodeContent(UUID.randomUUID().toString()); 
-        bookingService.createBooking(booking);
-
-        return ResponseEntity.ok("Parkplatz erfolgreich gebucht!\nQR-Code ist unter Meine Buchungen zu finden.");
+        try {
+            bookingService.tryCreateBookingIfCapacityAvailable(booking);
+            return ResponseEntity.ok("Parkplatz erfolgreich gebucht!\nQR-Code ist unter Meine Buchungen zu finden.");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
