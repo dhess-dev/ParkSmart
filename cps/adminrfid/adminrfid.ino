@@ -6,8 +6,8 @@
 
 
 // WiFi configuration
-const char *ssid = "FES-SuS";
-const char *password = "SuS-WLAN!Key24";
+const char *ssid = "BerufsschuleProjekte";
+const char *password = "berufsschule";
 
 // MQTT configuration
 const char *mqtt_server = "gruppe1iot-dev.local";
@@ -68,8 +68,6 @@ void WiFiEvent(WiFiEvent_t event)
 void onMqttConnect(bool sessionPresent)
 {
   Serial.println("Connected to MQTT");
-  // Subscribe to the "open gate" topic
-  mqttClient.subscribe("cps/#", 2);
 }
 
 // MQTT disconnect callback
@@ -82,26 +80,6 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
     xTimerStart(mqttReconnectTimer, 0);
   }
 }
-
-// MQTT message callback
-void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
-{
-  if (strcmp(topic, "cps/parking/gate/entry/open") == 0)
-  {
-    if (payload[0] == '1')
-    {
-      Serial.println("Opening entry gate...");
-    }
-    else
-    {
-      Serial.println("Closing entry gate...");
-    }
-  }
-  }
-
-
-
-
 
 void setup() {
   Serial.begin(115200);  // Initialize serial communication
@@ -122,7 +100,6 @@ void setup() {
    // Setup MQTT client
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
-  mqttClient.onMessage(onMqttMessage);
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCredentials(mqtt_user, mqtt_password);
   mqttClient.setClientId("MqttClientAdminRFID");

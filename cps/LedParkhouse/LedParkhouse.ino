@@ -77,8 +77,8 @@ void WiFiEvent(WiFiEvent_t event) {
 // MQTT connection callback
 void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT");
-  // Subscribe to the "open gate" topic
-  mqttClient.subscribe("cps/#", 2);
+  // Subscribe to the "LED" topic
+  mqttClient.subscribe("cps/parking/spot/#", 2);
 }
 
 // MQTT disconnect callback

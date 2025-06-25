@@ -7,8 +7,8 @@
 #include <LiquidCrystal_I2C.h>
 
 // WiFi configuration
-const char *ssid = "FES-SuS";
-const char *password = "SuS-WLAN!Key24";
+const char *ssid = "BerufsschuleProjekte";
+const char *password = "berufsschule";
 
 // MQTT configuration
 const char *mqtt_server = "gruppe1iot-dev.local";
@@ -101,7 +101,7 @@ void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT");
   mqttConnected = true;
   // Subscribe 
-  mqttClient.subscribe("cps/#", 2);
+  mqttClient.subscribe("cps/parking/gate/entry#", 2);
 
   // Subscribe to topics
   mqttClient.subscribe("cps/parking/spots/count", 2);

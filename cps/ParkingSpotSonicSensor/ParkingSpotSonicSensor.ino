@@ -2,9 +2,8 @@
 #include <AsyncMQTT_ESP32.h>
 
 // WiFi configuration
-// WiFi configuration
-const char *ssid = "FES-SuS";
-const char *password = "SuS-WLAN!Key24";
+const char *ssid = "BerufsschuleProjekte";
+const char *password = "berufsschule";
 
 // MQTT configuration
 const char *mqtt_server = "gruppe1iot-dev.local";
@@ -81,8 +80,6 @@ void WiFiEvent(WiFiEvent_t event) {
 // MQTT connection callback
 void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT");
-  // Subscribe to the "open gate" topic
-  mqttClient.subscribe("cps/#", 2);
 }
 
 // MQTT disconnect callback
