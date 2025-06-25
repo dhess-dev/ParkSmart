@@ -37,12 +37,11 @@ public class SecurityConfig {
                                 "/api/parkingCount",
                                 "/api/parkingCount/stream"
                         ).permitAll()
-                        // only ADMIN can update or delete arbitrary users:
-                        .requestMatchers(HttpMethod.GET,    "/api/users/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET,    "/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,    "/api/users/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/*").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/users").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
