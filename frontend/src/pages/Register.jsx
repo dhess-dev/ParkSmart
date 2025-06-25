@@ -49,10 +49,9 @@ export default function Register() {
 
             if (!res.ok) throw new Error(await res.text());
 
-            setSnackbarOpen(true); // 👈 show success notification
-
+            setSnackbarOpen(true); 
             setTimeout(() => {
-                navigate("/login"); // 👈 wait a bit before navigating
+                navigate("/login"); 
             }, 1500);
         } catch (err) {
             alert("Registrierung fehlgeschlagen: " + err.message);

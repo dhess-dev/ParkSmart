@@ -14,9 +14,9 @@ public class InitialPlanConfig {
     CommandLineRunner seedPlans(PlanRepository planRepository) {
         return args -> {
             if (planRepository.count() == 0) {
-                planRepository.save(new Plan("Tagespass", "Zugang für einen Tag", 10.0, 1));
-                planRepository.save(new Plan("Monatspass", "Unbegrenzter Zugang für einen Monat", 100.0, 30));
-                planRepository.save(new Plan("Jahrespass", "Unbegrenzter Zugang für ein Jahr", 1000.0, 365));
+                planRepository.save(new Plan("Tagespass", "Zugang für einen Tag", 29.99, 1));
+                planRepository.save(new Plan("Monatspass", "Unbegrenzter Zugang für einen Monat", 129.99, 30));
+                planRepository.save(new Plan("Jahrespass", "Unbegrenzter Zugang für ein Jahr", 999.99, 365));
             }
         };
     }
