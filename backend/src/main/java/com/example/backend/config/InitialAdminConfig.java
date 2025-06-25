@@ -29,6 +29,14 @@ public class InitialAdminConfig {
                 admin.setEmail("admin@example.com");
                 admin.setPassword("admin123"); // Password will be hashed
                 admin.setRoles(Set.of("USER", "ADMIN"));
+
+                admin.setFirstName("First");
+                admin.setLastName("Last");
+                admin.setPhoneNumber("123-456-789");
+                admin.setAddress("Teststraße ");
+                admin.setCity("City");
+                admin.setCountry("Country");
+                admin.setPostalCode("1000");
                 userRepository.save(admin);
                 System.out.println("Admin account created: username=admin, password=admin123");
             }
@@ -41,13 +49,21 @@ public class InitialAdminConfig {
                     user.setEmail(String.format("user%d@example.com", i));
                     user.setPassword(String.format("pass%d", i)); // will get BCrypt-hashed
                     user.setRoles(Set.of("USER"));
+
+                    user.setFirstName("First" + i);
+                    user.setLastName("Last" + i);
+                    user.setPhoneNumber("123-456-789" + i);
+                    user.setAddress("Teststraße " + i);
+                    user.setCity("City" + i);
+                    user.setCountry("Country" + i);
+                    user.setPostalCode("1000" + i);
+
                     userRepository.save(user);
-                    System.out.println(
-                            String.format("Created test user: username=%s, email=%s, password=pass%d",
-                                    username, username + "@example.com", i)
-                    );
+                    System.out.printf("Created test user: username=%s, email=%s, password=pass%d%n",
+                            username, user.getEmail(), i);
                 }
             }
+
             if (parkingSpotRepository.count() == 0) {
                 List<String> positions = List.of(
                         "A1", "A2", "A3", "A4"

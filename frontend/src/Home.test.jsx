@@ -16,9 +16,10 @@ test("renders Parking Dashboard with parking spots", async () => {
   render(<Home />);
 
   const heading = await screen.findByRole("heading", {
-    name: /Parking Dashboard/i,
+      name: /Aktuelle Parkplatzübersicht/i,
   });
-  expect(heading).toBeInTheDocument();
+
+    expect(heading).toBeInTheDocument();
 
   const spotA1 = await screen.findByText("A1");
   expect(spotA1).toBeInTheDocument();

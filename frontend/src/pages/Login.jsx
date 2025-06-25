@@ -40,7 +40,7 @@ export default function Login({onLogin}) {
             onSubmit={handleSubmit}
             sx={{maxWidth: 400, mx: "auto", mt: 5, display: "flex", flexDirection: "column", gap: 2}}
         >
-            <Typography variant="h4" align="center">Login</Typography>
+            <Typography variant="h4" align="center" color={"white"}>Login</Typography>
             <TextField
                 label="Username" value={username}
                 onChange={e => setUsername(e.target.value)} required

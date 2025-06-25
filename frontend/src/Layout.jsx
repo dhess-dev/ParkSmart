@@ -163,7 +163,7 @@ export default function Layout({ user, onLogout, mode, setMode }) {
         {drawer}
       </Drawer>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box component="main" sx={{ flexGrow: 1, p: 0 }}>
         <Toolbar />
         <Outlet />
       </Box>
