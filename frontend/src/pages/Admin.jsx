@@ -45,45 +45,37 @@ export default function AdminUsers() {
 
     // 3) Spalten definieren
     const columns = [
-        {field: "id", headerName: "ID", width: 70},
-        {field: "username", headerName: "Username", width: 150},
-        {field: "email", headerName: "E-Mail", width: 200},
-        {field: "firstName", headerName: "Vorname", width: 120},
-        {field: "lastName", headerName: "Nachname", width: 120},
-        {field: "phoneNumber", headerName: "Telefon", width: 140},
-        {field: "address", headerName: "Adresse", width: 200},
-        {field: "city", headerName: "Stadt", width: 120},
-        {field: "postalCode", headerName: "PLZ", width: 100},
-        {field: "country", headerName: "Land", width: 120},
+        { field: "id", headerName: "ID", flex: 0.2, minWidth: 60 },
+
+        // regular columns
+        { field: "username",   headerName: "Username",   flex: 1 },
+        { field: "email",      headerName: "E-Mail",     flex: 1.2 },
+        { field: "firstName",  headerName: "Vorname",    flex: 0.8 },
+        { field: "lastName",   headerName: "Nachname",   flex: 0.8 },
+        { field: "phoneNumber",headerName: "Telefon",    flex: 0.8 },
+        { field: "address",    headerName: "Adresse",    flex: 1.3, minWidth: 180 },
+        { field: "city",       headerName: "Stadt",      flex: 0.9 },
+        { field: "postalCode", headerName: "PLZ",        flex: 0.6 },
+        { field: "country",    headerName: "Land",       flex: 0.9 },
+
         {
             field: "roles",
             headerName: "Rollen",
-            width: 180,
-            renderCell: ({value}) => {
-                if (!Array.isArray(value) || value.length === 0) return "";
-                return value.join(", ");
-            },
+            flex: 0.9,
+            renderCell: ({ value }) => Array.isArray(value) ? value.join(", ") : "",
         },
         {
             field: "actions",
             headerName: "Aktionen",
-            width: 140,
+            flex: 0.8,
             sortable: false,
-            renderCell: ({row}) => (
+            renderCell: ({ row }) => (
                 <Stack direction="row" spacing={1}>
-                    <IconButton
-                        size="small"
-                        onClick={() => setEditUser(row)}
-                        color="primary"
-                    >
-                        <EditIcon/>
+                    <IconButton size="small" onClick={() => setEditUser(row)} color="primary">
+                        <EditIcon />
                     </IconButton>
-                    <IconButton
-                        size="small"
-                        onClick={() => handleDelete(row.id)}
-                        color="error"
-                    >
-                        <DeleteIcon/>
+                    <IconButton size="small" onClick={() => handleDelete(row.id)} color="error">
+                        <DeleteIcon />
                     </IconButton>
                 </Stack>
             ),
@@ -93,13 +85,26 @@ export default function AdminUsers() {
     return (
         <Box
             sx={{
-                maxWidth: 1650,
-                height: 600,
-                mx: "auto",
-                my: 4,
+                minHeight: 'calc(100vh - 100px)',
+                width: '100%',
+                overflow: 'hidden',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                px: 2,
+                py: 4,
+                boxSizing: 'border-box',
             }}
         >
-            <Box sx={{flexGrow: 1, mb: 2}}>
+
+            <Box
+                sx={{
+                    width: "100%",
+                    maxWidth: "1400px",
+                    overflowX: "auto",
+                    mb: 2,
+                }}
+            >
                 <DataGrid
                     rows={users}
                     columns={columns}
@@ -107,6 +112,20 @@ export default function AdminUsers() {
                     pageSize={10}
                     rowsPerPageOptions={[10]}
                     disableSelectionOnClick
+                    sx={{
+                        color: "white",
+                        borderColor: "white",
+                        '& .MuiDataGrid-cell': {
+                            color: "white",
+                        },
+                        '& .MuiDataGrid-columnHeader': {
+                            color: "white",
+                        },
+                        '& .MuiTablePagination-root': {
+                            color: "white",
+                        },
+                        maxHeight: "80vh"
+                    }}
                 />
             </Box>
 

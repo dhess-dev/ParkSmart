@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { CssBaseline } from "@mui/material";
+import {CssBaseline, GlobalStyles} from "@mui/material";
 
 import Layout from "./Layout";
 import Home from "./pages/Home";
@@ -32,10 +32,72 @@ export default function App() {
     palette: {
       mode: mode,
       background: {
-        default: mode === "dark" ? "hsl(230, 17%, 14%)" : "hsl(0, 0%, 100%)",
+        default: mode === "dark" ? "hsl(230, 17%, 14%)" : "#003366",
       },
     },
+      components: {
+          // 1️⃣ Text colour inside the input
+          MuiInputBase: {
+              styleOverrides: {
+                  input: {
+                      color: "#ffffff", // white text
+                  },
+                  root: {
+                      // also make the placeholder white(ish)
+                      "& .MuiInputBase-input::placeholder": {
+                          color: "rgba(255,255,255,0.7)",
+                          opacity: 1,
+                      },
+                  },
+              },
+          },
+
+          // 2️⃣ Label colour
+          MuiInputLabel: {
+              styleOverrides: {
+                  root: {
+                      color: "#ffffff",
+                      "&.Mui-focused": {
+                          color: "#ffffff",
+                      },
+                  },
+              },
+          },
+
+          // 3️⃣ Outlined border colour
+          MuiOutlinedInput: {
+              styleOverrides: {
+                  root: {
+                      "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "rgba(255,255,255,0.5)",
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#ffffff",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#ffffff",
+                      },
+                  },
+              },
+          },
+      },
   });
+    const globalStyles = (
+        <GlobalStyles
+            styles={{
+                body: {
+                    background: mode === "light"
+                        ? "linear-gradient(to bottom, #001F3F, #003366)"
+                        : "hsl(230, 17%, 14%)",
+                    backgroundRepeat: "no-repeat",
+                    backgroundAttachment: "fixed",
+                    minHeight: "100vh",
+                    margin: 0,
+                },
+            }}
+        />
+    );
+
 
   // Fetch current user on startup
   useEffect(() => {
@@ -54,6 +116,7 @@ export default function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
+            {globalStyles}
             <BrowserRouter>
                 <Routes>
                     <Route

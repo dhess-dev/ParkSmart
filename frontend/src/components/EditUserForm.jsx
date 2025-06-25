@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {
     Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Stack
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 export default function EditUserForm({user, open, onClose, onSaved, apiUrl}) {
     const [values, setValues] = useState(user);
@@ -32,8 +33,16 @@ export default function EditUserForm({user, open, onClose, onSaved, apiUrl}) {
         }
     };
 
-    return (<Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-        <DialogTitle>User bearbeiten</DialogTitle>
+    const theme = useTheme();
+
+    return (<Dialog open={open} onClose={onClose} fullWidth maxWidth="sm"  PaperProps={{
+        sx: {
+            backgroundColor: theme.palette.background.default,
+            color: theme.palette.text.primary,
+        }
+    }}>
+
+        <DialogTitle color={"white"}>User bearbeiten</DialogTitle>
         <DialogContent>
             <Stack spacing={2} mt={1}>
                 <TextField

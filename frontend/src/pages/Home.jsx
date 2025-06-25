@@ -132,13 +132,17 @@ export default function Dashboard() {
     return (
         <Box
             sx={{
-                minHeight: "100vh",
-                background: "linear-gradient(to bottom, #001F3F, #003366)",
-                color: "white",
-                py: 4,
+                minHeight: 'calc(100vh - 64px)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                px: 2,
+                color: 'white',
             }}
         >
-            <Container maxWidth="lg">
+            <Container maxWidth="lg" sx={{ width: '100%' }}>
                 {/* Header */}
                 <Box textAlign="center" mb={4}>
                     <img
@@ -146,36 +150,30 @@ export default function Dashboard() {
                         alt="ParkSmart Logo"
                         style={{
                             width: 300,
-                            maxWidth: "30%",
-                            marginBottom: 2,
-                            filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))",
+                            maxWidth: '30%',
+                            marginBottom: 8,
+                            filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))',
                         }}
                     />
-
                     <Typography variant="h4">
                         Stressfrei starten, <strong>smart parken!</strong>
                     </Typography>
                 </Box>
 
                 <Box textAlign="center" mb={2}>
-
-                <Typography  alignItems={"center"} variant="h4">
-                        Aktuelle Parkplatzübersicht
-                    </Typography>
+                    <Typography variant="h4">Aktuelle Parkplatzübersicht</Typography>
                 </Box>
 
+                <Divider sx={{ mb: 4, bgcolor: 'white' }} />
 
-                <Divider sx={{mb: 4, bgcolor: "white"}}/>
-
-                {/* Grid */}
                 <Box
                     display="grid"
                     gridTemplateColumns={`repeat(${rows[0].spots.length}, 1fr)`}
                     gridAutoRows="auto"
-                    sx={{width: "100%", rowGap: 1}}
+                    sx={{ width: '100%', rowGap: 1 }}
                 >
-                    {rows.map(({key, spots}, rowIndex) => (
-                        <Box key={key} sx={{display: "contents"}}>
+                    {rows.map(({ key, spots }, rowIndex) => (
+                        <Box key={key} sx={{ display: 'contents' }}>
                             {spots.map((spot, i) => (
                                 <SpotCell
                                     key={spot.id}
@@ -184,7 +182,6 @@ export default function Dashboard() {
                                     theme={theme}
                                 />
                             ))}
-
                             {spots.map((spot, i) => (
                                 <SpotLabel
                                     key={spot.id}
@@ -192,7 +189,6 @@ export default function Dashboard() {
                                     borderRight={makeBorder(i, spots.length)}
                                 />
                             ))}
-
                             {rowIndex === 0 && (
                                 <Box
                                     gridColumn={`1 / span ${spots.length}`}
@@ -206,7 +202,6 @@ export default function Dashboard() {
                     ))}
                 </Box>
 
-
                 <Box
                     mb={3}
                     display="flex"
@@ -215,26 +210,24 @@ export default function Dashboard() {
                     gap={4}
                 >
                     <Box display="flex" alignItems="center" gap={1}>
-                        <Box width={20} height={20} bgcolor={grey[800]}/>
+                        <Box width={20} height={20} bgcolor={grey[800]} />
                         <Typography variant="body2">Belegt</Typography>
                     </Box>
                     <Box display="flex" alignItems="center" gap={1}>
-                        <Box width={20} height={20} bgcolor={green[400]}/>
+                        <Box width={20} height={20} bgcolor={green[400]} />
                         <Typography variant="body2">Frei</Typography>
                     </Box>
-
                 </Box>
+
                 {/* Timestamp */}
                 <Box mt={4} textAlign="center">
                     <Typography variant="caption">
-                        Zuletzt aktualisiert am:{" "}
-                        {lastUpdate
-                            ? lastUpdate.toLocaleTimeString()
-                            : "Loading..."}
+                        Zuletzt aktualisiert am:{' '}
+                        {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Loading...'}
                     </Typography>
                 </Box>
 
-                <Divider sx={{mb: 4, bgcolor: "white"}}/>
+                <Divider sx={{ mb: 4, bgcolor: 'white' }} />
 
                 {/* Call to Action */}
                 <Box mt={5} textAlign="center">
