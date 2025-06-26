@@ -1,20 +1,26 @@
 package com.example.backend.controller;
 
-import com.example.backend.models.Plan;
-import com.example.backend.models.User;
-import com.example.backend.models.Booking;
-import com.example.backend.repositories.UserRepository;
-import com.example.backend.services.PlanService;
-import com.example.backend.services.BookingService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.backend.models.Booking;
+import com.example.backend.models.Plan;
+import com.example.backend.models.User;
+import com.example.backend.repositories.UserRepository;
+import com.example.backend.services.BookingService;
+import com.example.backend.services.PlanService;
 
 @RestController
 @RequestMapping("/api/plans")
@@ -49,7 +55,7 @@ public class PlanController {
     public ResponseEntity<String> purchasePlan(@RequestBody Map<String, Long> payload, Authentication authentication) {
         Long planId = payload.get("planId");
         if (planId == null) {
-            return ResponseEntity.badRequest().body("Invalid payload: planId is missing");
+            return ResponseEntity.badRequest().body("planId ist nicht vorhanden");
         }
 
         String username = authentication.getName();
@@ -58,7 +64,7 @@ public class PlanController {
         Plan plan = planService.getPlanById(planId);
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.badRequest().body("User not found: " + username);
+            return ResponseEntity.badRequest().body("User existiert nicht: " + username);
         }
         User user = optionalUser.get();
 
@@ -76,8 +82,11 @@ public class PlanController {
         }
 
         booking.setQrCodeContent(UUID.randomUUID().toString()); 
-        bookingService.createBooking(booking);
-
-        return ResponseEntity.ok("Plan purchased and booking created successfully!");
+        try {
+            bookingService.tryCreateBookingIfCapacityAvailable(booking);
+            return ResponseEntity.ok("Parkplatz erfolgreich gebucht!\nQR-Code ist unter Meine Buchungen zu finden.");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

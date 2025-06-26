@@ -1,8 +1,8 @@
 package com.example.backend.repositories;
 
-import java.util.Optional;
-
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,4 +15,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByUserOrderByStartTimeDesc(User user);
 
     Optional<Booking> findByQrCodeContent(String qrCodeContent);
+
+    int countByEndTimeAfter(OffsetDateTime time);
 }
