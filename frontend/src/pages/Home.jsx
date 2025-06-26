@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import {grey, green} from "@mui/material/colors";
-import logo from "/parksmart_logo.png"; // Place this in /public or handle import if using asset bundling
+import logo from "/parksmart_logo.png";
 
 function useParkingSpots(apiUrl) {
     const [spots, setSpots] = useState([]);
@@ -255,7 +255,7 @@ export default function Dashboard() {
                                 variant="contained"
                                 color="success"
                                 size="large"
-                                href="/plans" // or wherever logged-in users go
+                                href="/plans"
                             >
                                 Zur Buchung
                             </Button>

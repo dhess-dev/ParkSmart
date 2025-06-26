@@ -5,7 +5,6 @@ import { CssBaseline, GlobalStyles } from "@mui/material";
 
 import Layout from "./Layout";
 import Home from "./pages/Home";
-import About from "./pages/About";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
@@ -36,14 +35,12 @@ export default function App() {
       },
     },
     components: {
-      // 1️⃣ Text colour inside the input
       MuiInputBase: {
         styleOverrides: {
           input: {
-            color: "#ffffff", // white text
+            color: "#ffffff",
           },
           root: {
-            // also make the placeholder white(ish)
             "& .MuiInputBase-input::placeholder": {
               color: "rgba(255,255,255,0.7)",
               opacity: 1,
@@ -52,7 +49,6 @@ export default function App() {
         },
       },
 
-      // 2️⃣ Label colour
       MuiInputLabel: {
         styleOverrides: {
           root: {
@@ -64,7 +60,6 @@ export default function App() {
         },
       },
 
-      // 3️⃣ Outlined border colour
       MuiOutlinedInput: {
         styleOverrides: {
           root: {
@@ -125,8 +120,6 @@ export default function App() {
               <Layout
                 user={user}
                 onLogout={() => {
-                  // call your logout endpoint to clear the session cookie,
-                  // then clear local user state:
                   fetch(`${apiUrl}/api/users/logout`, {
                     method: "POST",
                     credentials: "include",
@@ -137,7 +130,6 @@ export default function App() {
               />
             }
           >
-            {/* Public */}
             <Route index element={<Home />} />
             <Route path="register" element={<Register />} />
             <Route
@@ -145,7 +137,6 @@ export default function App() {
               element={
                 <Login
                   onLogin={() => {
-                    // after successful login, re-fetch /me:
                     fetch(`${apiUrl}/api/users/me`, { credentials: "include" })
                       .then((r) => {
                         if (!r.ok) throw new Error("Failed to fetch user data");
@@ -158,7 +149,6 @@ export default function App() {
               }
             />
 
-            {/* Authenticated */}
             <Route
               path="profile"
               element={
@@ -184,7 +174,6 @@ export default function App() {
               }
             />
 
-            {/* Admin only */}
             <Route
               path="admin"
               element={
