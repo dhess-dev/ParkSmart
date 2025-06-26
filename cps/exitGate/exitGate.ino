@@ -6,11 +6,11 @@
 #include <ESP32Servo.h>
 
 // WiFi configuration
-const char *ssid = "FES-SuS";
-const char *password = "SuS-WLAN!Key24";
+const char *ssid = "BerufsschuleProjekte";
+const char *password = "berufsschule";
 
 // MQTT configuration
-const char *mqtt_server = "gruppe1iot.local";
+const char *mqtt_server = "gruppe1iot-dev.local";
 const int mqtt_port = 1883;
 const char *mqtt_user = "gruppe1";
 const char *mqtt_password = "gruppe1";
@@ -75,8 +75,8 @@ void WiFiEvent(WiFiEvent_t event) {
 // MQTT connection callback
 void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT");
-  // Subscribe to the "open gate" topic
-  mqttClient.subscribe("cps/#", 2);
+  // Subscribe to the "exit gate" topic
+  mqttClient.subscribe("cps/parking/gate/exit/#", 2);
 }
 
 // MQTT disconnect callback
