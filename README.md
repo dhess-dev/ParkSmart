@@ -28,11 +28,13 @@ Die Sensoren und Aktoren werden jeweils an zwei ESP32-S3 Dev Modules und zwei ES
 
 Im Client können sich Nutzer registrieren und Parkplätze buchen. Durch die Buchung wird im Backend ein QR-Code generiert und passend in der Datenbank gespeichert, sodass sich der Nutzer mithilfe dieses QR-Codes validieren und Zugang zur Parkfläche erhalten kann. 
 
-Fährt ein Auto auf einen Parkplatz wird dieser durch eine rote LED als besetzt angezeigt. Sobald das Auto a
-
+Fährt ein Auto auf einen Parkplatz wird dieser durch eine rote LED als besetzt angezeigt. 
 Außerdem bietet das System eine Übersicht über freie Parkplätze sowie Statistiken zur Auslastung der Fläche.
 Die Kommunikation zwischen Backend und Frontend ist über HTTPS geregelt.
 Die Benutzer, Buchungen, Buchungsangebote, Belegung der Parkplätze sowie die Anzahl der Besucher pro Tag werden in einer PostgreSQL-Datenbank gespeichert.
+
+Das Projekt wurde in vier Sprints unterteilt. Um den aktuellen Stand der jeweiligen Sprints einschätzen zu können, wurde für jeden Sprint ein Burndown-Chart erstellt. Diese sind in diesem Projekt unter /projektmanagement zu finden.
+Die Tickets, die in den Sprints bearbeitet wurden, sind unter GitHub im Projekt ParkSmart zu finden (https://github.com/orgs/fes-wiesbaden/projects/15).
 
 ## Projekt lokal ausführen
 
@@ -86,15 +88,14 @@ So ist gewährleistet, dass keine sensiblen Daten (z. B. Passwörter oder Buch
 ## Wichtige Komponenten
 
 * **Cyber‑Physisches System (CPS):** Mikrocontroller‑basierte Sensoren und Aktoren steuern das Parkhaus.
-* **Edge‑Konnektivität:** Alle CPS‑Geräte veröffentlichen Telemetrie und empfangen Befehle via **MQTT**.
-* **Backend:** Eine Spring‑Boot‑3.4‑REST‑API abonniert MQTT‑Topics, persistiert Daten in PostgreSQL, stellt **SSE**‑Streams für Live‑Updates bereit und übernimmt Authentifizierung & Abrechnung.
+* **Backend:** Eine Spring‑Boot‑3.4‑REST‑API abonniert MQTT‑Topics, persistiert Daten in PostgreSQL, stellt **SSE**‑Streams für Live‑Updates bereit und übernimmt Authentifizierung.
 * **Sicherheit:** Alle REST‑Endpunkte laufen über HTTPS mit X.509‑Zertifikaten (.pem / .p12). MQTT wird über eine unverschlüsselte Verbindung (tcp:// Port 1883) mit Benutzername/Passwort‑Authentifizierung verwendet.
-* **Frontend:** Eine React‑18‑Single‑Page‑App (Vite, MUI) liefert Dashboards, Buchungsflüsse und ein Admin‑Interface.
+* **Frontend:** Eine React‑18‑Single‑Page‑App (Vite, MUI) liefert Dashboards, Buchungen und ein Admin‑Interface.
 * **Raspberry Pi**: Hosten von Backend, Datenbank und MQTT-Broker über Docker Compose. Dient als zentrale Brücke zwischen Webplattform und CPS-Geräten.
 
 
 
-> So entsteht ein Echtzeitsystem, in dem Nutzer\:innen Stellplätze buchen, anfahren und das Parkhaus ohne Personal betreten oder verlassen können.
+> So entsteht ein Echtzeitsystem, in dem Nutzer\:innen Parkplätze buchen, anfahren und das Parkhaus ohne Personal betreten oder verlassen können.
 
 ---
 
