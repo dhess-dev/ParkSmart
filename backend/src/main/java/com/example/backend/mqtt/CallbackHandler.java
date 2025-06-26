@@ -109,14 +109,6 @@ public class CallbackHandler implements MqttCallback {
                     parkingService.createParkingStatusEntry(eventType);
                     parkingService.updateParkingCount();
                 }
-
-                boolean isCarInRange = distanceEntryGate > 5 && distanceEntryGate <= 10;
-                if (isCarInRange && !parkingService.isExitGateOpened()) {
-                    String eventType = "exit";
-                    mqttClientManager.publishMessage("cps/parking/gate/exit/open", "1");
-                    parkingService.setExitGateOpened(true);
-                    parkingService.createParkingStatusEntry(eventType);
-                }
             }
 
             case "backend/parking/distance/close/exitGate" -> {
@@ -124,6 +116,8 @@ public class CallbackHandler implements MqttCallback {
                 boolean isCarInRange = distanceExitGate < 6;
                 if (isCarInRange && parkingService.isExitGateOpened()) {
                     parkingService.setExitGateOpened(false);
+                    String eventType = "exit";
+                    parkingService.createParkingStatusEntry(eventType);
                     mqttClientManager.publishMessage("cps/parking/gate/exit/open", "0");
                 }
             }

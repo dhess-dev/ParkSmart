@@ -1,101 +1,99 @@
-import { Outlet, Link, useNavigate, useLocation  } from "react-router-dom";
+import {Outlet, Link, useNavigate, useLocation} from "react-router-dom";
 import {
-  AppBar,
-  Box,
-  CssBaseline,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Toolbar,
-  Typography,
-  Avatar,
-  Tooltip,
-  Menu,
-  MenuItem,
-  Button,
-  Switch,
+    AppBar,
+    Box,
+    CssBaseline,
+    Divider,
+    Drawer,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Toolbar,
+    Typography,
+    Avatar,
+    Tooltip,
+    Menu,
+    MenuItem,
+    Button,
+    Switch,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useState } from "react";
+import {useState} from "react";
 
-export default function Layout({ user, onLogout, mode, setMode }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const navigate = useNavigate();
-  const pageTitle = {
-    "/": "Home",
-    "/dashboard": "Dashboard",
-    "/bookings": "Meine Buchungen",
-    "/plans": "Parkplatz buchen",
-    "/profile": "Profil",
-    "/admin": "Admin",
-    "/login": "Login",
-    "/register": "Registrieren",
-  };
-  const currentPage = pageTitle[location.pathname] || "My App";
-  const drawer = (
-    <Box sx={{ textAlign: "center" }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        My App
-      </Typography>
-      <Divider />
-      <List>
-        {[
-          { label: "Home", to: "/" },
-          { label: "Dashboard", to: "/dashboard" },
-          { label: "Meine Buchungen", to: "/bookings" },
-          { label: "Parkplatz buchen", to: "/plans" },
-          ...(user
-            ? [
-                { label: "Profil", to: "/profile" },
-                ...(user.roles.includes("ADMIN")
-                  ? [{ label: "Admin", to: "/admin" }]
-                  : []),
-              ]
-            : []),
-        ].map((item) => (
-          <ListItem
-            button
-            key={item.to}
-            component={Link}
-            to={item.to}
-            onClick={() => setMobileOpen(false)}
-          >
-            <ListItemText primary={item.label} />
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
+export default function Layout({user, onLogout, mode, setMode}) {
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const navigate = useNavigate();
+    const pageTitle = {
+        "/": "Home",
+        "/dashboard": "Dashboard",
+        "/bookings": "Meine Buchungen",
+        "/plans": "Parkplatz buchen",
+        "/profile": "Profil",
+        "/admin": "Admin",
+        "/login": "Login",
+        "/register": "Registrieren",
+    };
+    const currentPage = pageTitle[location.pathname] || "My App";
+    const drawer = (
+        <Box sx={{textAlign: "center"}}>
+            <Typography variant="h6" sx={{my: 2}}>
+                My App
+            </Typography>
+            <Divider/>
+            <List>
+                {[
+                    {label: "Home", to: "/"},
+                    {label: "Meine Buchungen", to: "/bookings"},
+                    {label: "Parkplatz buchen", to: "/plans"},
+                    ...(user
+                        ? [
+                            ...(user.roles.includes("ADMIN")
+                                ? [{label: "Admin", to: "/admin"}, {label: "Dashboard", to: "/dashboard"}]
+                                : []),
+                        ]
+                        : []),
+                ].map((item) => (
+                    <ListItem
+                        button
+                        key={item.to}
+                        component={Link}
+                        to={item.to}
+                        onClick={() => setMobileOpen(false)}
+                    >
+                        <ListItemText primary={item.label}/>
+                    </ListItem>
+                ))}
+            </List>
+        </Box>
+    );
 
-  return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: 1201 }}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={() => setMobileOpen((o) => !o)}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
+    return (
+        <Box sx={{display: "flex"}}>
+            <CssBaseline/>
+            <AppBar position="fixed" sx={{zIndex: 1201}}>
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        edge="start"
+                        onClick={() => setMobileOpen((o) => !o)}
+                        sx={{mr: 2}}
+                    >
+                        <MenuIcon/>
+                    </IconButton>
 
-          <Typography variant="h6" noWrap>
-            {currentPage}
-          </Typography>
-          <Box sx={{ flexGrow: 1 }} />
+                    <Typography variant="h6" noWrap>
+                        {currentPage}
+                    </Typography>
+                    <Box sx={{flexGrow: 1}}/>
 
-          {/* Theme Switch */}
-          <Switch
-            checked={mode === "dark"}
-            onChange={() => setMode(mode === "light" ? "dark" : "light")}
-            color="default"
-          />
+                    {/* Theme Switch */}
+                    <Switch
+                        checked={mode === "dark"}
+                        onChange={() => setMode(mode === "light" ? "dark" : "light")}
+                        color="default"
+                    />
 
                     {user ? (
                         <>
@@ -153,20 +151,20 @@ export default function Layout({ user, onLogout, mode, setMode }) {
                 </Toolbar>
             </AppBar>
 
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-        ModalProps={{ keepMounted: true }}
-        sx={{ "& .MuiDrawer-paper": { width: 240 } }}
-      >
-        {drawer}
-      </Drawer>
+            <Drawer
+                variant="temporary"
+                open={mobileOpen}
+                onClose={() => setMobileOpen(false)}
+                ModalProps={{keepMounted: true}}
+                sx={{"& .MuiDrawer-paper": {width: 240}}}
+            >
+                {drawer}
+            </Drawer>
 
-        <Box component="main" sx={{ flexGrow: 1, p: 0 }}>
-        <Toolbar />
-        <Outlet />
-      </Box>
-    </Box>
-  );
+            <Box component="main" sx={{flexGrow: 1, p: 0}}>
+                <Toolbar/>
+                <Outlet/>
+            </Box>
+        </Box>
+    );
 }

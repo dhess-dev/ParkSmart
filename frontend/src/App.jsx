@@ -1,11 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import {CssBaseline, GlobalStyles} from "@mui/material";
+import { CssBaseline, GlobalStyles } from "@mui/material";
 
 import Layout from "./Layout";
 import Home from "./pages/Home";
-import About from "./pages/About";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
@@ -35,69 +34,65 @@ export default function App() {
         default: mode === "dark" ? "hsl(230, 17%, 14%)" : "#003366",
       },
     },
-      components: {
-          // 1️⃣ Text colour inside the input
-          MuiInputBase: {
-              styleOverrides: {
-                  input: {
-                      color: "#ffffff", // white text
-                  },
-                  root: {
-                      // also make the placeholder white(ish)
-                      "& .MuiInputBase-input::placeholder": {
-                          color: "rgba(255,255,255,0.7)",
-                          opacity: 1,
-                      },
-                  },
-              },
+    components: {
+      MuiInputBase: {
+        styleOverrides: {
+          input: {
+            color: "#ffffff",
           },
-
-          // 2️⃣ Label colour
-          MuiInputLabel: {
-              styleOverrides: {
-                  root: {
-                      color: "#ffffff",
-                      "&.Mui-focused": {
-                          color: "#ffffff",
-                      },
-                  },
-              },
+          root: {
+            "& .MuiInputBase-input::placeholder": {
+              color: "rgba(255,255,255,0.7)",
+              opacity: 1,
+            },
           },
-
-          // 3️⃣ Outlined border colour
-          MuiOutlinedInput: {
-              styleOverrides: {
-                  root: {
-                      "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "rgba(255,255,255,0.5)",
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#ffffff",
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#ffffff",
-                      },
-                  },
-              },
-          },
+        },
       },
-  });
-    const globalStyles = (
-        <GlobalStyles
-            styles={{
-                body: {
-                    background: mode === "light"
-                        ? "linear-gradient(to bottom, #001F3F, #003366)"
-                        : "hsl(230, 17%, 14%)",
-                    backgroundRepeat: "no-repeat",
-                    backgroundAttachment: "fixed",
-                    minHeight: "100vh",
-                    margin: 0,
-                },
-            }}
-        />
-    );
 
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            color: "#ffffff",
+            "&.Mui-focused": {
+              color: "#ffffff",
+            },
+          },
+        },
+      },
+
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255,255,255,0.5)",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#ffffff",
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#ffffff",
+            },
+          },
+        },
+      },
+    },
+  });
+  const globalStyles = (
+    <GlobalStyles
+      styles={{
+        body: {
+          background:
+            mode === "light"
+              ? "linear-gradient(to bottom, #001F3F, #003366)"
+              : "hsl(230, 17%, 14%)",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
+          minHeight: "100vh",
+          margin: 0,
+        },
+      }}
+    />
+  );
 
   // Fetch current user on startup
   useEffect(() => {
@@ -113,49 +108,47 @@ export default function App() {
 
   if (loading) return <p>Loading…</p>;
 
-    return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {globalStyles}
-            <BrowserRouter>
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <Layout
-                                user={user}
-                                onLogout={() => {
-                                    // call your logout endpoint to clear the session cookie,
-                                    // then clear local user state:
-                                    fetch(`${apiUrl}/api/users/logout`, {
-                                        method: "POST",
-                                        credentials: "include",
-                                    }).finally(() => setUser(null));
-                                }}
-                                mode={mode}
-                                setMode={setMode}
-                            />
-                        }
-                    >
-                        {/* Public */}
-                        <Route index element={<Home/>}/>
-                        <Route path="dashboard" element={<Dashboard/>}/>
-                        <Route path="register" element={<Register/>}/>
-                        <Route
-                            path="login"
-                            element={<Login onLogin={() => {
-                                // after successful login, re-fetch /me:
-                                fetch(`${apiUrl}/api/users/me`, {credentials: "include"})
-                                    .then(r => {
-                                        if (!r.ok) throw new Error("Failed to fetch user data");
-                                        return r.json();
-                                    })
-                                    .then(setUser)
-                                    .catch(() => setUser(null));
-                            }}/>}
-                        />
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {globalStyles}
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Layout
+                user={user}
+                onLogout={() => {
+                  fetch(`${apiUrl}/api/users/logout`, {
+                    method: "POST",
+                    credentials: "include",
+                  }).finally(() => setUser(null));
+                }}
+                mode={mode}
+                setMode={setMode}
+              />
+            }
+          >
+            <Route index element={<Home />} />
+            <Route path="register" element={<Register />} />
+            <Route
+              path="login"
+              element={
+                <Login
+                  onLogin={() => {
+                    fetch(`${apiUrl}/api/users/me`, { credentials: "include" })
+                      .then((r) => {
+                        if (!r.ok) throw new Error("Failed to fetch user data");
+                        return r.json();
+                      })
+                      .then(setUser)
+                      .catch(() => setUser(null));
+                  }}
+                />
+              }
+            />
 
-            {/* Authenticated */}
             <Route
               path="profile"
               element={
@@ -181,12 +174,19 @@ export default function App() {
               }
             />
 
-            {/* Admin only */}
             <Route
               path="admin"
               element={
                 <AdminRoute user={user}>
                   <Admin />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="dashboard"
+              element={
+                <AdminRoute user={user}>
+                  <Dashboard />
                 </AdminRoute>
               }
             />

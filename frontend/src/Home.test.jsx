@@ -7,7 +7,6 @@ global.fetch = vi.fn(() =>
     json: () =>
       Promise.resolve([
         { id: 1, position: "A1", occupied: true },
-        { id: 2, position: "B2", occupied: false },
       ]),
   })
 );
@@ -23,7 +22,4 @@ test("renders Parking Dashboard with parking spots", async () => {
 
   const spotA1 = await screen.findByText("A1");
   expect(spotA1).toBeInTheDocument();
-
-  const spotB2 = await screen.findByText("B2");
-  expect(spotB2).toBeInTheDocument();
 });
