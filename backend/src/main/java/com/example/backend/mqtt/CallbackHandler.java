@@ -151,5 +151,6 @@ public class CallbackHandler implements MqttCallback {
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
         // nothing to do
+        
     }
 }
