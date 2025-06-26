@@ -100,15 +100,11 @@ void WiFiEvent(WiFiEvent_t event) {
 void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT");
   mqttConnected = true;
-  // Subscribe 
-  mqttClient.subscribe("cps/parking/gate/entry#", 2);
 
   // Subscribe to topics
   mqttClient.subscribe("cps/parking/spots/count", 2);
   mqttClient.subscribe("cps/parking/full", 2);
-  mqttClient.subscribe("cps/parking/gate/validation/rfid/error", 2);
-  mqttClient.subscribe("cps/parking/gate/validation/qrCode/error", 2);
-  mqttClient.subscribe("cps/parking/gate/validation/qrCode/expired", 2);
+  mqttClient.subscribe("cps/parking/gate/validation#", 2);
   mqttClient.subscribe("cps/parking/gate/entry/open", 2);
   
   requestParkingData();
@@ -133,7 +129,7 @@ void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties 
     if (payload[0] == '1') {
       Serial.println("Opening entry gate...");
       // Rotate servo to 90 degrees to open the entry gate
-      servoEntryGate.write(90);
+      servoEntryGate.write(85);
       
       showFullWarning = false;
       showRFIDWarning = false;

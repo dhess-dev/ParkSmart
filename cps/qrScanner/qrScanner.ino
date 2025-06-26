@@ -72,10 +72,6 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
     }
 }
 
-void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
-{
-}
-
 ESP32QRCodeReader reader(CAMERA_MODEL_AI_THINKER);
 
 void onQrCodeTask(void *pvParameters)
@@ -118,7 +114,6 @@ void setup()
     // Setup MQTT client
     mqttClientCam.onConnect(onMqttConnect);
     mqttClientCam.onDisconnect(onMqttDisconnect);
-    mqttClientCam.onMessage(onMqttMessage);
     mqttClientCam.setServer(mqtt_server, mqtt_port);
     mqttClientCam.setCredentials(mqtt_user, mqtt_password);
     mqttClientCam.setClientId("ESP32ClientCam");
