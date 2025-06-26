@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import {grey, green} from "@mui/material/colors";
-import logo from "/parksmart_logo.png"; // Place this in /public or handle import if using asset bundling
+import logo from "/parksmart_logo.png";
 
 function useParkingSpots(apiUrl) {
     const [spots, setSpots] = useState([]);
@@ -123,11 +123,26 @@ export default function Dashboard() {
 
     const rows = [
         {key: "A", spots: getRow("A")},
-        {key: "B", spots: getRow("B")},
     ];
 
     const makeBorder = (i, length) =>
         i < length - 1 ? `2px dashed ${theme.palette.divider}` : undefined;
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        fetch(`${apiUrl}/api/users/me`, {
+            credentials: "include", // important for session cookies
+        })
+            .then((res) => {
+                if (res.ok) {
+                    setIsLoggedIn(true);
+                } else {
+                    setIsLoggedIn(false);
+                }
+            })
+            .catch(() => setIsLoggedIn(false));
+    }, [apiUrl]);
 
     return (
         <Box
@@ -204,6 +219,7 @@ export default function Dashboard() {
 
                 <Box
                     mb={3}
+                    mt={3}
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
@@ -220,29 +236,47 @@ export default function Dashboard() {
                 </Box>
 
                 {/* Timestamp */}
-                <Box mt={4} textAlign="center">
+                <Box mt={2} textAlign="center">
                     <Typography variant="caption">
                         Zuletzt aktualisiert am:{' '}
                         {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Loading...'}
                     </Typography>
                 </Box>
 
-                <Divider sx={{ mb: 4, bgcolor: 'white' }} />
+                <Divider sx={{ mb: 2, bgcolor: 'white' }} />
 
-                {/* Call to Action */}
-                <Box mt={5} textAlign="center">
-                    <Typography variant="h6" mb={2}>
-                        Zugang zum Parkplatz erhalten?
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        href="/register"
-                    >
-                        Jetzt registrieren & Zugang sichern
-                    </Button>
+                <Box mt={2} textAlign="center">
+                    {isLoggedIn ? (
+                        <>
+                            <Typography variant="h6" mb={2}>
+                                Du bist eingeloggt – starte jetzt!
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                color="success"
+                                size="large"
+                                href="/plans"
+                            >
+                                Zur Buchung
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Typography variant="h6" mb={2}>
+                                Zugang zum Parkplatz erhalten?
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                href="/register"
+                            >
+                                Jetzt registrieren & Zugang sichern
+                            </Button>
+                        </>
+                    )}
                 </Box>
+
             </Container>
         </Box>
     );

@@ -66,16 +66,26 @@ export default function UserForm({
                                         required &&
                                         !values[name]?.toString().trim()
                                     }
-                                    InputLabelProps={{
-                                        style: {
-                                            color: "white",
-                                            fontSize: "1.2rem", // label font size
+                                    InputProps={{
+                                        sx: {
+                                            "&.Mui-disabled": {
+                                                color: "white",
+                                                opacity: 1,
+                                            },
+                                            "& input.Mui-disabled": {
+                                                WebkitTextFillColor: "white !important",
+                                                color: "white",
+                                                opacity: 1,
+                                            },
                                         },
                                     }}
-                                    InputProps={{
-                                        style: {
+                                    InputLabelProps={{
+                                        sx: {
                                             color: "white",
-                                            fontSize: "1.3rem", // input text font size
+                                            "&.Mui-disabled": {
+                                                color: "white",
+                                                opacity: 1,
+                                            },
                                         },
                                     }}
                                 />

@@ -28,7 +28,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/login",
                                 "/api/dashboard",
-                                "/api/users",
                                 "/api/users/me",
                                 "/api/plans",
                                 "/api/parkingSpot",
@@ -38,7 +37,8 @@ public class SecurityConfig {
                                 "/api/parkingCount",
                                 "/api/parkingCount/stream"
                         ).permitAll()
-                        // only ADMIN can update or delete arbitrary users:
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET,    "/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,    "/api/users/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/*").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
