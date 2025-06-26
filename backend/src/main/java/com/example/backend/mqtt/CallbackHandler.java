@@ -116,6 +116,8 @@ public class CallbackHandler implements MqttCallback {
                 boolean isCarInRange = distanceExitGate < 6;
                 if (isCarInRange && parkingService.isExitGateOpened()) {
                     parkingService.setExitGateOpened(false);
+                    String eventType = "exit";
+                    parkingService.createParkingStatusEntry(eventType);
                     mqttClientManager.publishMessage("cps/parking/gate/exit/open", "0");
                 }
             }
